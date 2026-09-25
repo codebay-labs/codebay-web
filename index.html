@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeBay — macOS 原生的 AI 编程助手会话中枢</title>
+<meta name="description" content="CodeBay 以项目为单位，统一管理、预览和恢复 Claude Code / Codex / OpenCode / DeepSeek / OMP / Pi 的终端会话。纯 Swift + SwiftUI，无 Electron。">
+<meta property="og:title" content="CodeBay — macOS 原生的 AI 编程助手会话中枢">
+<meta property="og:description" content="一个界面，管住你所有的 AI 编程会话。">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/logo.png">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="nav" id="top">
+  <a class="nav-brand" href="#top">
+    <img src="assets/logo.png" alt="" width="28" height="28">
+    <span>CodeBay</span>
+  </a>
+  <nav class="nav-links">
+    <a href="#agents">Agent 生态</a>
+    <a href="#features">功能</a>
+    <a href="#native">为什么原生</a>
+    <a href="#faq">常见问题</a>
+  </nav>
+  <a class="btn btn-small" href="#download">获取 CodeBay</a>
+</header>
+
+<main>
+
+<!-- ======== HERO ======== -->
+<section class="hero">
+  <div class="hero-inner">
+    <p class="hero-badge">macOS 14+ · 纯 Swift + SwiftUI · 无 Electron</p>
+    <h1>一个界面<br>管住你所有的<br><span class="grad">AI 编程会话</span></h1>
+    <p class="hero-sub">CodeBay 是 macOS 原生的 AI 编程助手会话中枢——以项目为单位，统一管理、预览和恢复 Claude&nbsp;Code、Codex、OpenCode、DeepSeek、OMP、Pi 的终端会话。</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="#download">获取 CodeBay</a>
+      <a class="btn btn-ghost" href="#features">了解更多</a>
+    </div>
+    <p class="hero-note">需要 macOS 14 或更新 · 使用前请先安装你使用的 Agent CLI</p>
+  </div>
+
+  <div class="mockup" aria-hidden="true">
+    <div class="mock-titlebar">
+      <span class="dots"><i></i><i></i><i></i></span>
+      <span class="mock-tabs"><b class="on">my-app</b><b>docs-site</b><b>kernels</b></span>
+    </div>
+    <div class="mock-body">
+      <aside class="mock-side">
+        <p class="mock-cap">项目</p>
+        <div class="m-proj on">
+          <span class="m-fold">▾</span> my-app
+          <ul>
+            <li class="on"><i class="dot a-claude"></i>重构支付模块</li>
+            <li><i class="dot a-codex"></i>修复登录闪退</li>
+            <li><i class="dot a-oc"></i>补充单元测试</li>
+          </ul>
+        </div>
+        <div class="m-proj"><span class="m-fold">▸</span> docs-site</div>
+        <div class="m-proj"><span class="m-fold">▸</span> kernels</div>
+        <p class="mock-cap">Git 工作树</p>
+        <div class="m-wt"><code>feat/pay</code><span>·</span><i class="dot a-claude"></i></div>
+        <div class="m-wt"><code>fix/login</code><span>·</span><i class="dot a-codex"></i></div>
+      </aside>
+      <div class="mock-term">
+<pre><span class="tp">❯ claude</span>  <span class="ta">重构支付模块，先给出方案</span>
+<span class="tg">●</span> 读取 <span class="tf">PaymentService.swift</span> …
+<span class="tg">●</span> 提出 3 个方案，等待确认
+<span class="tp">❯</span> <span class="cursor"></span></pre>
+        <div class="mock-input">直发给 <i class="dot a-claude"></i><i class="dot a-codex"></i><i class="dot a-omp"></i> <span>⌘↵ 并行启动</span></div>
+      </div>
+      <aside class="mock-dock">
+        <b class="on" title="会话历史">☰</b><b title="Shell">⌘</b><b title="文件">🗂</b><b title="Git">⑂</b>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ======== AGENTS ======== -->
+<section class="section" id="agents">
+  <div class="wrap">
+    <p class="kicker">Agent 生态</p>
+    <h2>你用什么 Agent，CodeBay 就管什么 Agent</h2>
+    <p class="lead">内置适配六大终端 Agent，会话自动索引、点击即恢复；CLI 升级不担心失效——会话目录与命令行参数均可在设置中覆盖。</p>
+    <div class="agent-grid">
+      <div class="agent-card"><i class="dot a-claude"></i><h3>Claude Code</h3><p>原生会话扫描与恢复</p></div>
+      <div class="agent-card"><i class="dot a-codex"></i><h3>Codex</h3><p>原生会话扫描与恢复</p></div>
+      <div class="agent-card"><i class="dot a-oc"></i><h3>OpenCode</h3><p>原生会话扫描与恢复</p></div>
+      <div class="agent-card"><i class="dot a-ds"></i><h3>DeepSeek (dsh)</h3><p>原生会话扫描与恢复</p></div>
+      <div class="agent-card"><i class="dot a-omp"></i><h3>OMP</h3><p>原生会话扫描与恢复</p></div>
+      <div class="agent-card"><i class="dot a-pi"></i><h3>Pi</h3><p>原生会话扫描与恢复</p></div>
+    </div>
+    <div class="plugin-panel">
+      <div class="plugin-copy">
+        <h3>用别的 Agent？贴一份 JSON 就行</h3>
+        <p>自定义 Agent 是<strong>数据不是代码</strong>：在「设置 → Agents → Add Agent → 自定义」粘贴一份定义，实测通过即接入。模板占位符覆盖会话目录与恢复参数，甚至支持 SQLite 型会话存储。插件 JSON 永不执行，只读打开、参数绑定，安全边界清晰。</p>
+        <a class="text-link" href="#faq">查看支持细节 →</a>
+      </div>
+      <div class="plugin-code">
+<pre><span class="tc">// aider，一条插件就加上</span>
+{
+  <span class="tk">"name"</span>: <span class="ts">"Aider"</span>,
+  <span class="tk">"executable"</span>: <span class="ts">"aider"</span>,
+  <span class="tk">"resumeArgs"</span>: <span class="ts">"--restore {id}"</span>,
+  <span class="tk">"sessionsDir"</span>: <span class="ts">"{home}/.aider/sessions"</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======== FEATURES ======== -->
+<section class="section" id="features">
+  <div class="wrap">
+    <p class="kicker">功能</p>
+    <h2>为并发的 AI 会话而设计</h2>
+    <div class="feature-grid">
+      <article class="feature">
+        <div class="f-icon">☰</div>
+        <h3>会话中枢</h3>
+        <p>按项目与 Agent 分组索引全部历史会话，点击即在新标签页恢复。切走的项目会话依然存活，回来接着跑。</p>
+      </article>
+      <article class="feature">
+        <div class="f-icon">⑂</div>
+        <h3>Git 工作树隔离</h3>
+        <p>一个分支一份 checkout，多个 Agent 并发改代码互不踩踏；支持多仓库「工作树组」与分支清单管理。</p>
+      </article>
+      <article class="feature">
+        <div class="f-icon">✓</div>
+        <h3>Git 变更面板</h3>
+        <p>暂存、提交、放弃、逐行 diff——审查 Agent 的产出不用切回命令行。</p>
+      </article>
+      <article class="feature">
+        <div class="f-icon">▶</div>
+        <h3>内嵌终端</h3>
+        <p>基于 SwiftTerm 与自研 PTY 后端，Metal 渲染。多标签、可选 Shell、亮暗双套 ANSI 配色，会话结束一键重启。</p>
+      </article>
+      <article class="feature">
+        <div class="f-icon">⌕</div>
+        <h3>文件与全文搜索</h3>
+        <p>完整文件树加文件名与内容全文搜索，点击即预览；1100+ vscode-icons 图标，一眼认出每种文件。</p>
+      </article>
+      <article class="feature">
+        <div class="f-icon">⚡</div>
+        <h3>多 Agent 并行直发</h3>
+        <p>同一条提示词勾选多个 Agent 同时起跑，对比各自方案；支持拖拽与粘贴附件。</p>
+      </article>
+      <article class="feature">
+        <div class="f-icon">⌘</div>
+        <h3>快捷键体系</h3>
+        <p>⌘K 全局搜索、⇧⌘N 新会话、⌘↵ 启动——双手不离键盘完成整套会话操作。</p>
+      </article>
+      <article class="feature">
+        <div class="f-icon">◐</div>
+        <h3>中英双语</h3>
+        <p>界面中英文齐全，设置内切换立即生效，无需重启。</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ======== NATIVE ======== -->
+<section class="section" id="native">
+  <div class="wrap">
+    <p class="kicker">为什么原生</p>
+    <h2>不是网页套壳，是一台 Mac 应用</h2>
+    <div class="native-grid">
+      <div class="native-item">
+        <h3>Swift + SwiftUI</h3>
+        <p>无 Electron、无 Chromium。无标题栏沉浸式三栏布局，左栏项目、中栏会话、右侧活动坞，与 macOS 的质感一致。</p>
+      </div>
+      <div class="native-item">
+        <h3>数据只在你机器上</h3>
+        <p>配置 JSON 原子写盘；只索引 Agent 的原生会话文件，不复制内容、不上传任何数据，无需注册任何账号。</p>
+      </div>
+      <div class="native-item">
+        <h3>扫得快，刷得实时</h3>
+        <p>64KB 头部探测加缓存，371MB 会话历史全量扫描从 9.1 秒降到 0.6 秒；FSEvents 监听目录，会话列表自动刷新。</p>
+      </div>
+      <div class="native-item">
+        <h3>安全边界明确</h3>
+        <p>插件 JSON 永不执行；SQLite 只读打开、SQL 参数绑定防注入；插件声明的链接仅接受 HTTPS。</p>
+      </div>
+    </div>
+    <div class="stat-strip">
+      <div class="stat"><b>6</b><span>内置 Agent 适配</span></div>
+      <div class="stat"><b>0.6s</b><span>371MB 历史扫描</span></div>
+      <div class="stat"><b>1100+</b><span>文件图标</span></div>
+      <div class="stat"><b>0</b><span>字节离开本机</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======== DOWNLOAD ======== -->
+<section class="section" id="download">
+  <div class="wrap download-card">
+    <img src="assets/logo.png" alt="CodeBay" width="72" height="72">
+    <h2>把每个 AI 会话都留在港口</h2>
+    <p class="lead">管理、预览、恢复你的全部 AI 编程终端会话——在一个原生 Mac 应用里。</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary btn-big" href="#download" aria-disabled="true">下载 macOS 版（即将发布）</a>
+    </div>
+    <p class="hero-note">签名与公证分发筹备中，正式发布后此处提供下载 · 需要 macOS 14 或更新</p>
+  </div>
+</section>
+
+<!-- ======== FAQ ======== -->
+<section class="section" id="faq">
+  <div class="wrap narrow">
+    <p class="kicker">常见问题</p>
+    <h2>你可能想问</h2>
+    <details>
+      <summary>CodeBay 会上传我的会话或代码吗？</summary>
+      <p>不会。CodeBay 完全离线工作：它只读取各 Agent 存在本机的会话文件建立索引，不复制会话内容，没有账号体系，也没有任何遥测上传。</p>
+    </details>
+    <details>
+      <summary>内置支持哪些 Agent？我想用的不在名单里怎么办？</summary>
+      <p>内置 Claude Code、Codex、OpenCode、DeepSeek（dsh）、OMP、Pi 六个适配器。名单之外的 Agent 可以通过「自定义 Agent」接入：贴一份 JSON 定义（可执行文件、新会话/恢复参数、会话目录），实测通过即可使用，无需等待官方更新。</p>
+    </details>
+    <details>
+      <summary>Agent 的 CLI 更新了，会话会不会找不到？</summary>
+      <p>每个 Agent 的可执行文件路径、会话目录与参数都可在设置面板单独覆盖，优先级高于内置默认值，因此上游 CLI 升级路径或参数时你可以立刻修正。</p>
+    </details>
+    <details>
+      <summary>多个 Agent 同时改一个仓库，会不会互相冲突？</summary>
+      <p>CodeBay 用 Git 工作树做隔离：一个分支一份独立 checkout，各跑各的；多个仓库还可以组成「工作树组」一起切换。恢复会话时会话所在的工作树会一并就位。</p>
+    </details>
+    <details>
+      <summary>对系统有什么要求？</summary>
+      <p>macOS 14 或更新的 Apple Silicon / Intel Mac。CodeBay 本身不代理任何模型请求，你使用的 Agent CLI 需自行安装并配置好登录。</p>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-inner">
+    <div class="foot-brand">
+      <img src="assets/logo.png" alt="" width="24" height="24">
+      <span>CodeBay</span>
+      <p>macOS 原生的 AI 编程助手会话中枢</p>
+    </div>
+    <div class="foot-cols">
+      <div>
+        <h4>产品</h4>
+        <a href="#agents">Agent 生态</a>
+        <a href="#features">功能</a>
+        <a href="#download">下载</a>
+      </div>
+      <div>
+        <h4>支持</h4>
+        <a href="#faq">常见问题</a>
+        <a href="#native">隐私与数据</a>
+      </div>
+    </div>
+  </div>
+  <div class="wrap foot-legal">
+    <p>© 2026 CodeBay · 内置第三方组件：SwiftTerm（MIT）、vscode-icons（MIT, Roberto Huertas）</p>
+    <p>Claude Code、Codex 等为各自商标所有者的名称，仅作兼容性描述使用。</p>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>
