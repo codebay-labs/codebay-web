@@ -42,33 +42,58 @@
     <p class="note">MACOS 14 或更新&nbsp;&nbsp;·&nbsp;&nbsp;数据不出本机&nbsp;&nbsp;·&nbsp;&nbsp;无需账号</p>
   </div>
 
-  <figure class="shot" aria-hidden="true">
-    <div class="shot-bar"><i></i><i></i><i></i><span>CodeBay — my-app</span></div>
-    <div class="shot-body">
-      <div class="shot-l">
-        <p class="cap">项目</p>
-        <div class="on">▾ my-app</div>
-        <ul>
-          <li class="on"><i class="d1"></i>重构支付模块</li>
-          <li><i class="d2"></i>修复登录闪退</li>
-          <li><i class="d3"></i>补充单元测试</li>
-        </ul>
-        <div>▸ docs-site</div>
-        <div>▸ kernels</div>
-        <p class="cap gold">GIT 工作树</p>
-        <div class="wt"><code>feat/pay</code><i class="d1"></i></div>
-        <div class="wt"><code>fix/login</code><i class="d2"></i></div>
+  <div class="wrap">
+    <div class="car" data-car>
+      <div class="car-stage">
+
+        <div class="slide on">
+          <div class="frame">
+            <picture>
+              <source type="image/webp" srcset="assets/shots/composer.webp">
+              <img src="assets/shots/composer.png" width="1600" height="997" loading="eager" decoding="async"
+                   alt="CodeBay 的新建会话页：左侧是项目列表，中间是会话起草卡，卡片下方一排 Agent 芯片与「启动」按钮，右侧是会话记录列表。">
+            </picture>
+          </div>
+          <p class="car-cap"><b>01</b><span>新建会话 —— 选项目、挑 Agent、一句话启动，六个内置助手都在同一排芯片里。</span></p>
+        </div>
+
+        <div class="slide">
+          <div class="frame">
+            <picture>
+              <source type="image/webp" srcset="assets/shots/git.webp">
+              <img src="assets/shots/git.png" width="1600" height="997" loading="eager" decoding="async"
+                   alt="CodeBay 的 Git 变更面板：提交信息已填写，改动按已暂存、变更、未跟踪三组列出，每行显示增删行数。">
+            </picture>
+          </div>
+          <p class="car-cap"><b>02</b><span>变更即审 —— Agent 改了什么，面板里按已暂存 / 变更 / 未跟踪分好组，写好信息一次提交。</span></p>
+        </div>
+
+        <div class="slide">
+          <div class="frame">
+            <picture>
+              <source type="image/webp" srcset="assets/shots/diff.webp">
+              <img src="assets/shots/diff.png" width="1600" height="997" loading="eager" decoding="async"
+                   alt="CodeBay 的逐行补丁视图：左边是变更文件列表，右边展开某个文件的行级差异，红绿两色标注删除与新增。">
+            </picture>
+          </div>
+          <p class="car-cap"><b>03</b><span>逐行看补丁 —— 点任意一个文件展开行级差异，不满意就地回滚，不用切到别的窗口。</span></p>
+        </div>
+
       </div>
-      <div class="shot-r">
-        <div><span class="g">❯</span> <span class="w">claude</span> 重构支付模块，先给出方案</div>
-        <div class="muted">· 读取 <span class="gold">PaymentService.swift</span></div>
-        <div class="muted">· 提出 3 个方案，等待确认</div>
-        <div><span class="g">❯</span> <span class="w">用方案二，开始改</span></div>
-        <div class="muted">· 已修改 4 个文件，变更面板待审</div>
-        <div><span class="g">❯</span> <span class="caret"></span></div>
+
+      <div class="car-bar">
+        <div class="dots" role="tablist" aria-label="界面截图">
+          <button type="button" role="tab" aria-selected="true"  data-go="0">新建会话</button>
+          <button type="button" role="tab" aria-selected="false" data-go="1">Git 变更</button>
+          <button type="button" role="tab" aria-selected="false" data-go="2">逐行补丁</button>
+        </div>
+        <div class="car-nav">
+          <button type="button" data-prev aria-label="上一张">←</button>
+          <button type="button" data-next aria-label="下一张">→</button>
+        </div>
       </div>
     </div>
-  </figure>
+  </div>
 </section>
 
 <div class="wrap"><div class="rule"></div></div>
