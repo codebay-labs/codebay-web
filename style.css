@@ -131,11 +131,23 @@ h2.big { font-size: clamp(32px, 5vw, 58px); line-height: 1.4; }
 /* agents table */
 .agents { display: grid; grid-template-columns: 1fr 1fr; }
 .agents > div {
-  padding: 22px 4px; border-bottom: 1px solid var(--hair-soft);
-  font-size: 15px; display: flex; justify-content: space-between; align-items: baseline; gap: 14px;
+  padding: 20px 4px; border-bottom: 1px solid var(--hair-soft);
+  font-size: 15px; display: flex; justify-content: space-between; align-items: center; gap: 14px;
 }
-.agents span { font-family: var(--mono); font-size: 9.5px; letter-spacing: .24em; color: var(--faint); }
+.agents .tag { font-family: var(--mono); font-size: 9.5px; letter-spacing: .24em; color: var(--faint); }
+.agents .who { display: flex; align-items: center; gap: 13px; font-size: 15px; color: var(--ink); }
 .agents .last { grid-column: span 2; border-bottom: 0; }
+/* The chip is the app's own: a rounded tile wearing the agent's accent, with
+   the vendored brand mark sitting on it. OMP's plate is part of its logo, so
+   that one draws edge to edge with no tint behind it. */
+.chip {
+  flex: none; width: 32px; height: 32px; display: grid; place-items: center;
+  border: 1px solid var(--hair-soft); border-radius: 8px; background: var(--tint, rgba(207, 174, 99, .08));
+}
+.chip img { display: block; width: 20px; height: 20px; }
+.chip.tile { background: #0f0a14; border-color: rgba(255, 255, 255, .1); }
+.chip.tile img { width: 30px; height: 30px; border-radius: 7px; }
+.chip b { font-family: var(--mono); font-size: 12px; font-weight: 400; color: var(--gold); }
 .json {
   margin-top: 34px; padding: 26px 28px; background: var(--bg-raise); border: 1px solid var(--hair-soft);
   font-family: var(--mono); font-size: 12.5px; line-height: 2.1; color: #9c9992; overflow-x: auto;
