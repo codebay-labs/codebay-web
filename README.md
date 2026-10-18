@@ -29,3 +29,9 @@ Scripts/deploy-web.sh
 需要本机已安装并登录 `gh`。
 
 > 部署仓库只保存站点产物；这里（`web/`）才是源文件，不要在发布仓库里直接改内容。
+
+## 发布流程
+
+`.github/workflows/release.yml` 从私有源码仓库 `go-kenka/CodeBay` 构建 App，
+并把 DMG 发到本仓库的 GitHub Release（资产名固定为 `CodeBay.dmg`）。
+详见主仓库的 `docs/release.md`。
