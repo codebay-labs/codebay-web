@@ -5,6 +5,7 @@ CodeBay 的产品主页，纯静态站点（HTML + CSS + 原生 JS，无构建�
 - 入口：`index.html`
 - 样式：`style.css`（拉丁字体为自托管子集，位于 `assets/fonts/`）
 - 脚本：`main.js`
+- 未签名预览安装脚本：`install.sh`（下载、校验、ad-hoc 签名、安装）
 - 图片：`assets/shots/hero.webp` 与 `assets/logo.png`
 
 ## 本地预览

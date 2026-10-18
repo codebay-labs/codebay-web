@@ -139,7 +139,7 @@ jobs:
             PRERELEASE=""
             NOTE="已在 Apple notary 服务公证。"
           else
-            TITLE="CodeBay $VERSION（未签名预览）"
+            TITLE="CodeBay ${VERSION}（未签名预览）"
             PRERELEASE="--prerelease"
             NOTE="这是未签名构建：macOS 会提示“无法验证开发者”，需要右键 App → 打开，或在系统设置中放行。"
           fi

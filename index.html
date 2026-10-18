@@ -436,13 +436,44 @@ git status
             会把它标成不可恢复并说明原因，而不是启动一个注定失败的进程。
           </p>
         </details>
+        <details class="rv">
+          <summary>
+            没有 Apple 签名，怎么安装？<svg
+              viewBox="0 0 20 20"
+              aria-hidden="true"
+            >
+              <path d="M10 4v12M4 10h12" />
+            </svg>
+          </summary>
+          <p>
+            预览版是 ad-hoc 签名，macOS 会提示“无法验证开发者”。安装后在 Finder
+            里右键 CodeBay →「打开」即可；也可以使用
+            <a href="install.sh">install.sh</a>，它会下载、校验、ad-hoc
+            签名并安装到
+            ~/Applications。这只是测试版的分发方式，不等于正式签名。
+          </p>
+        </details>
       </div>
       <section class="final rv" id="get">
         <h2>把会话收进 CodeBay</h2>
-        <span class="btn soon" role="button" aria-disabled="true"
-          >下载 macOS 版（即将发布）</span
-        >
-        <p class="soonnote">签名与公证分发筹备中，正式发布后这里提供下载。</p>
+        <div class="cta">
+          <a
+            class="btn"
+            href="https://github.com/go-kenka/codebay-site/releases/download/v0.1.0/CodeBay.dmg"
+            >下载 macOS 版（未签名预览）</a
+          >
+          <a class="btn ghost" href="install.sh">查看安装脚本</a>
+        </div>
+        <p class="soonnote">
+          当前是未签名测试版：首次打开请在 Finder 里右键 CodeBay
+          →「打开」。也可以运行
+          <code
+            >curl -fsSL https://go-kenka.github.io/codebay-site/install.sh |
+            bash -s -- --allow-unsigned</code
+          >
+          安装（脚本会 ad-hoc 签名并清除隔离属性；仅在你信任该构建时使用）。
+          正式签名与公证版仍在筹备中。
+        </p>
       </section>
       <footer>
         CodeBay · Swift 6 + SwiftUI · macOS 14+ · 数据留在本机 ·
