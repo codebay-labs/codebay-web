@@ -448,8 +448,8 @@ git status
           <p>
             预览版是 ad-hoc 签名，macOS 会提示“无法验证开发者”。安装后在 Finder
             里右键 CodeBay →「打开」即可；也可以使用
-            <a href="install.sh">install.sh</a>，它会下载、校验、ad-hoc
-            签名并安装到
+            <a href="install.sh">install.sh</a>，它会按芯片选择 Apple Silicon 或
+            Intel 安装包，下载、校验、ad-hoc 签名并安装到
             ~/Applications。这只是测试版的分发方式，不等于正式签名。
           </p>
         </details>
@@ -459,19 +459,26 @@ git status
         <div class="cta">
           <a
             class="btn"
-            href="https://github.com/go-kenka/codebay-site/releases/download/v0.1.0/CodeBay.dmg"
-            >下载 macOS 版（未签名预览）</a
+            href="https://github.com/go-kenka/codebay-site/releases/download/v0.1.0/CodeBay-arm64.dmg"
+            >下载 Apple Silicon 版</a
           >
-          <a class="btn ghost" href="install.sh">查看安装脚本</a>
+          <a
+            class="btn ghost"
+            href="https://github.com/go-kenka/codebay-site/releases/download/v0.1.0/CodeBay-x86_64.dmg"
+            >下载 Intel 版</a
+          >
+          <a class="btn ghost" href="install.sh">安装脚本</a>
         </div>
         <p class="soonnote">
-          当前是未签名测试版：首次打开请在 Finder 里右键 CodeBay
-          →「打开」。也可以运行
+          当前是未签名测试版，Apple Silicon 与 Intel
+          分开编译、不混入同一份二进制。 首次打开请在 Finder 里右键 CodeBay
+          →「打开」；也可以运行
           <code
             >curl -fsSL https://go-kenka.github.io/codebay-site/install.sh |
             bash -s -- --allow-unsigned</code
           >
-          安装（脚本会 ad-hoc 签名并清除隔离属性；仅在你信任该构建时使用）。
+          安装（脚本会按芯片选择安装包、ad-hoc
+          签名并清除隔离属性；仅在你信任该构建时使用）。
           正式签名与公证版仍在筹备中。
         </p>
       </section>

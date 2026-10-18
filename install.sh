@@ -28,6 +28,17 @@ if [ -z "$TAG" ]; then
 fi
 BASE="https://github.com/$REPO/releases/download/$TAG"
 
+ARCH="$CODEBAY_ARCH"
+if [ -z "$ARCH" ]; then ARCH="$(uname -m)"; fi
+if [ "$ARCH" = "aarch64" ]; then ARCH="arm64"; fi
+if [ "$(sysctl -in sysctl.proc_translated 2>/dev/null || true)" = "1" ]; then
+  ARCH="arm64"
+fi
+case "$ARCH" in
+  arm64|x86_64) ;;
+  *) echo "unsupported architecture: $ARCH" >&2; exit 1 ;;
+esac
+
 FROM=""
 IDENTITY=""
 ALLOW_UNSIGNED=0
@@ -74,7 +85,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-DMG="$WORK/CodeBay.dmg"
+DMG="$WORK/CodeBay-$ARCH.dmg"
 if [ -n "$FROM" ]; then
   case "$FROM" in
     http://*|https://*)
@@ -90,11 +101,11 @@ if [ -n "$FROM" ]; then
       ;;
   esac
 else
-  echo "==> Downloading $BASE/CodeBay.dmg"
-  curl -fL --retry 3 -o "$DMG" "$BASE/CodeBay.dmg"
+  echo "==> Downloading $BASE/CodeBay-$ARCH.dmg"
+  curl -fL --retry 3 -o "$DMG" "$BASE/CodeBay-$ARCH.dmg"
   if curl -fsL --retry 2 -o "$WORK/SHA256SUMS" "$BASE/SHA256SUMS"; then
-    echo "==> Verifying SHA256SUMS"
-    (cd "$WORK" && shasum -a 256 -c SHA256SUMS)
+    echo "==> Verifying SHA256SUMS for $ARCH"
+    (cd "$WORK" && grep " CodeBay-$ARCH.dmg$" SHA256SUMS > "checksum-$ARCH" && shasum -a 256 -c "checksum-$ARCH")
   else
     echo "!! No SHA256SUMS in the release; continuing without a checksum."
     shasum -a 256 "$DMG"

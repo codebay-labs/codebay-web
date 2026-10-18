@@ -98,19 +98,27 @@ jobs:
         run: |
           set -euo pipefail
           SIGNED=0
+          MODE="preview"
           if [ -n "$DEVELOPER_ID_P12_BASE64" ] && [ -n "$APPLE_APP_PASSWORD" ]; then
             xcrun notarytool store-credentials codebay-notary \
               --apple-id "$APPLE_ID" \
               --team-id "$APPLE_TEAM_ID" \
               --password "$APPLE_APP_PASSWORD"
-            Scripts/release.sh signed
+            MODE="signed"
             SIGNED=1
-            cp "dist/CodeBay-$CODEBAY_VERSION-macOS.dmg" dist/CodeBay.dmg
-          else
-            Scripts/release.sh preview
-            cp "dist/CodeBay-$CODEBAY_VERSION-unsigned-preview.dmg" dist/CodeBay.dmg
           fi
-          (cd dist && shasum -a 256 CodeBay.dmg > SHA256SUMS)
+          rm -f dist/SHA256SUMS
+          for ARCH in arm64 x86_64; do
+            echo "==> Building $ARCH"
+            CODEBAY_ARCH="$ARCH" Scripts/release.sh "$MODE"
+            if [ "$MODE" = "signed" ]; then
+              SRC="dist/CodeBay-$CODEBAY_VERSION-macOS-$ARCH.dmg"
+            else
+              SRC="dist/CodeBay-$CODEBAY_VERSION-macOS-$ARCH-unsigned-preview.dmg"
+            fi
+            cp "$SRC" "dist/CodeBay-$ARCH.dmg"
+          done
+          (cd dist && shasum -a 256 CodeBay-arm64.dmg CodeBay-x86_64.dmg > SHA256SUMS)
           echo "SIGNED=$SIGNED" >> "$GITHUB_ENV"
           ls -lh dist/
 
@@ -119,7 +127,8 @@ jobs:
         with:
           name: CodeBay-${{ env.VERSION }}
           path: |
-            dist/CodeBay.dmg
+            dist/CodeBay-arm64.dmg
+            dist/CodeBay-x86_64.dmg
             dist/SHA256SUMS
           if-no-files-found: error
 
@@ -150,13 +159,14 @@ jobs:
 
           - 构建：$(date -u +"%Y-%m-%d %H:%M UTC")
           - 源码提交：$SOURCE_SHA
-          - 安装：把 CodeBay 拖进「应用程序」。
+          - 安装：把对应架构的 CodeBay 拖进「应用程序」。
+          - 架构：Apple Silicon（arm64）与 Intel（x86_64）分开编译、分开打包。
           - 校验：`shasum -a 256 -c SHA256SUMS`
           EOF
           if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
-            gh release upload "$TAG" dist/CodeBay.dmg dist/SHA256SUMS --repo "$REPO" --clobber
+            gh release upload "$TAG" dist/CodeBay-arm64.dmg dist/CodeBay-x86_64.dmg dist/SHA256SUMS --repo "$REPO" --clobber
           else
-            gh release create "$TAG" dist/CodeBay.dmg dist/SHA256SUMS \
+            gh release create "$TAG" dist/CodeBay-arm64.dmg dist/CodeBay-x86_64.dmg dist/SHA256SUMS \
               --repo "$REPO" \
               --title "$TITLE" \
               --notes-file "$RUNNER_TEMP/notes.md" \
