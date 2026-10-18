@@ -5,7 +5,7 @@
 #   curl -fsSL https://go-kenka.github.io/codebay-site/install.sh | bash -s -- --allow-unsigned
 #
 # What it does:
-#   1. downloads CodeBay.dmg from the latest preview release
+#   1. downloads CodeBay-<arch>.dmg from the latest preview release
 #   2. verifies SHA256SUMS when available
 #   3. copies CodeBay.app to /Applications (or ~/Applications)
 #   4. ad-hoc signs it (or signs with --identity if you have your own cert)
