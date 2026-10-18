@@ -33,6 +33,12 @@ jobs:
           ssh-key: ${{ secrets.APP_DEPLOY_KEY }}
           persist-credentials: false
 
+      - name: Record source commit
+        run: |
+          SOURCE_SHA="$(git rev-parse HEAD)"
+          echo "SOURCE_SHA=$SOURCE_SHA" >> "$GITHUB_ENV"
+          echo "Source commit: $SOURCE_SHA"
+
       - name: Show toolchain
         run: |
           sw_vers
@@ -104,7 +110,7 @@ jobs:
             Scripts/release.sh preview
             cp "dist/CodeBay-$CODEBAY_VERSION-unsigned-preview.dmg" dist/CodeBay.dmg
           fi
-          shasum -a 256 dist/CodeBay.dmg > dist/SHA256SUMS
+          (cd dist && shasum -a 256 CodeBay.dmg > SHA256SUMS)
           echo "SIGNED=$SIGNED" >> "$GITHUB_ENV"
           ls -lh dist/
 
@@ -123,6 +129,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ env.VERSION }}
           SIGNED: ${{ env.SIGNED }}
+          SOURCE_SHA: ${{ env.SOURCE_SHA }}
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
@@ -142,7 +149,7 @@ jobs:
           $NOTE
 
           - 构建：$(date -u +"%Y-%m-%d %H:%M UTC")
-          - 提交：$GITHUB_SHA
+          - 源码提交：$SOURCE_SHA
           - 安装：把 CodeBay 拖进「应用程序」。
           - 校验：`shasum -a 256 -c SHA256SUMS`
           EOF
