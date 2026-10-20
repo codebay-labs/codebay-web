@@ -187,9 +187,7 @@ document.documentElement.classList.add("js");
   var typeEl = $("#typeText");
   var caretEl = $("#typeCaret");
   var rowsEl = $("#termRows");
-  var toastEl = $("#termToast");
-  var toastClose = $("#toastClose");
-  var phrase = "把三个 Agent 收进一个窗口，别让它们互相打架。";
+  var phrase = "修登录、补测试、调研依赖——别让它们互相打架。";
   if (typeEl && rowsEl) {
     $$(".trow", rowsEl).forEach(function (row, index) {
       row.style.setProperty("--rd", index * 110 + "ms");
@@ -198,7 +196,6 @@ document.documentElement.classList.add("js");
       typeEl.textContent = phrase;
       if (caretEl) caretEl.style.display = "none";
       rowsEl.classList.add("in");
-      if (toastEl) toastEl.classList.add("show");
     } else {
       typeEl.textContent = "";
       var charIndex = 0;
@@ -213,23 +210,10 @@ document.documentElement.classList.add("js");
         window.setTimeout(function () {
           rowsEl.classList.add("in");
         }, 280);
-        window.setTimeout(function () {
-          if (!toastEl) return;
-          toastEl.classList.add("show");
-          window.setTimeout(function () {
-            toastEl.classList.remove("show");
-          }, 9000);
-        }, 1600);
       };
       window.setTimeout(typeNext, 620);
     }
   }
-  if (toastClose && toastEl) {
-    toastClose.addEventListener("click", function () {
-      toastEl.classList.remove("show");
-    });
-  }
-
   (function sparkleField() {
     var canvas = $("#sparkles");
     if (!canvas) return;
@@ -319,35 +303,74 @@ document.documentElement.classList.add("js");
     }
   })();
 
-  var shotSection = $(".reveal-shot");
-  var shotFrame = $("#shotFrame");
-  var shotHead = $(".shot-head");
-  if (shotSection && shotFrame) {
-    var narrow = function () {
-      return window.innerWidth <= 820;
+  var storySection = $(".story-section");
+  var storyStage = $("#storyStage");
+  var storyFrame = $("#shotFrame");
+  var chaosCards = storyStage ? $$(".chaos-card", storyStage) : [];
+  if (storySection && storyStage && storyFrame) {
+    var storyItems = [];
+    var cacheStory = function () {
+      var halfW = storyStage.clientWidth / 2;
+      var halfH = storyStage.clientHeight / 2;
+      storyItems = chaosCards
+        .filter(function (card) {
+          return card.offsetWidth > 0;
+        })
+        .map(function (card) {
+        return {
+          el: card,
+          x: card.offsetLeft,
+          y: card.offsetTop,
+          w: card.offsetWidth,
+          h: card.offsetHeight,
+          r: parseFloat(card.style.getPropertyValue("--r")) || 0,
+          cx: halfW,
+          cy: halfH,
+        };
+      });
     };
-    var paintShot = function (progress) {
-      var eased = smooth(clamp(progress / 0.82, 0, 1));
-      var maxTilt = narrow() ? 5 : 20;
-      var baseScale = narrow() ? 0.97 : 0.86;
-      var grow = narrow() ? 0.03 : 0.14;
-      shotFrame.style.setProperty("--rx", (maxTilt * (1 - eased)).toFixed(2) + "deg");
-      shotFrame.style.setProperty("--sc", (baseScale + grow * eased).toFixed(4));
-      shotFrame.style.setProperty("--ty", ((1 - eased) * (narrow() ? 40 : 70)).toFixed(1) + "px");
-      shotFrame.style.setProperty("--op", (0.45 + 0.55 * eased).toFixed(3));
-      if (shotHead) {
-        shotHead.style.setProperty("--headY", (-eased * 18).toFixed(1) + "px");
-      }
+    var paintStory = function (progress) {
+      var collapse = smooth(clamp((progress - 0.02) / 0.26, 0, 1));
+      var fade = 1 - smooth(clamp((progress - 0.14) / 0.16, 0, 1));
+      storyItems.forEach(function (item) {
+        var dx = item.cx - (item.x + item.w / 2);
+        var dy = item.cy - (item.y + item.h / 2);
+        item.el.style.transform =
+          "translate3d(" +
+          (dx * collapse).toFixed(1) +
+          "px," +
+          (dy * collapse).toFixed(1) +
+          "px,0) rotate(" +
+          (item.r * (1 - collapse)).toFixed(2) +
+          "deg) scale(" +
+          (1 - collapse * 0.72).toFixed(3) +
+          ")";
+        item.el.style.opacity = fade.toFixed(3);
+      });
+      var reveal = smooth(clamp((progress - 0.16) / 0.34, 0, 1));
+      storyFrame.style.setProperty("--rx", (18 * (1 - reveal)).toFixed(2) + "deg");
+      storyFrame.style.setProperty("--sc", (0.82 + 0.18 * reveal).toFixed(4));
+      storyFrame.style.setProperty("--ty", (60 * (1 - reveal)).toFixed(1) + "px");
+      storyFrame.style.setProperty("--op", reveal.toFixed(3));
+      storySection.classList.toggle("is-after", progress > 0.22);
     };
+    cacheStory();
     if (reduced) {
-      paintShot(1);
-      shotFrame.style.setProperty("--rx", "0deg");
+      paintStory(1);
     } else {
       scrollers.push(function () {
-        var rect = shotSection.getBoundingClientRect();
-        var total = shotSection.offsetHeight - window.innerHeight;
+        var rect = storySection.getBoundingClientRect();
+        var total = storySection.offsetHeight - window.innerHeight;
         var progress = total > 0 ? clamp(-rect.top / total, 0, 1) : 1;
-        paintShot(progress);
+        paintStory(progress);
+      });
+      var storyResize = 0;
+      window.addEventListener("resize", function () {
+        window.clearTimeout(storyResize);
+        storyResize = window.setTimeout(function () {
+          cacheStory();
+          requestScroll();
+        }, 160);
       });
     }
   }
@@ -468,17 +491,23 @@ document.documentElement.classList.add("js");
         entries.forEach(function (entry) {
           if (!entry.isIntersecting) return;
           var id = entry.target.getAttribute("id");
+          var match = null;
           navAnchors.forEach(function (link) {
-            link.classList.toggle("active", link.getAttribute("href") === "#" + id);
+            if (link.getAttribute("href") === "#" + id) match = link;
+          });
+          navAnchors.forEach(function (link) {
+            link.classList.toggle("active", link === match);
           });
         });
       },
       { rootMargin: "-38% 0px -52% 0px", threshold: 0 }
     );
-    ["control-room", "capabilities", "attention", "faq"].forEach(function (id) {
-      var section = document.getElementById(id);
-      if (section) spy.observe(section);
-    });
+    ["control-room", "capabilities", "attention", "numbers", "cities", "start", "faq", "get"].forEach(
+      function (id) {
+        var section = document.getElementById(id);
+        if (section) spy.observe(section);
+      }
+    );
   }
 
   var heroFlip = $("#heroFlip");

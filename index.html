@@ -42,9 +42,12 @@
     <link rel="stylesheet" href="style.css" />
     <noscript>
       <style>
-        .reveal-shot { height: auto; padding: 96px 0; }
-        .shot-sticky { position: relative; height: auto; padding-top: 0; }
-        .shot-frame { opacity: 1; transform: none; }
+        .nav { background: rgba(5, 7, 12, 0.92); border-bottom-color: var(--line); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+        .story-section { height: auto; padding: 96px 0; }
+        .story-sticky { position: relative; height: auto; padding-top: 0; }
+        .chaos, .story-cap.cap-before { display: none; }
+        .story-caps, .shot-orbit { opacity: 1; transform: none; }
+        .shot-frame { position: relative; top: auto; left: auto; width: min(1000px, 90vw); margin: 0 auto; opacity: 1; transform: none; }
         .lamp-line { opacity: 1; transform: none; }
         .lamp-cone, .lamp-glow { opacity: 0.9; }
         .hero-title .tg-line { opacity: 1; transform: none; filter: none; }
@@ -167,7 +170,7 @@
           <div class="hero-copy">
             <span class="pill rv" data-rv="0">
               <span class="pill-spark"><svg class="ic" aria-hidden="true"><use href="#i-spark" /></svg></span>
-              macOS 原生 · 六个 Agent · 一间控制室
+              macOS 原生 · SwiftUI · 非 Electron
               <span class="pill-live" aria-hidden="true"></span>
             </span>
             <h1 class="hero-title">
@@ -177,8 +180,7 @@
             </h1>
             <p class="hero-serif">One window. Six agents. Zero cloud.</p>
             <p class="hero-lede">
-              把 <b>Claude Code、Codex、OpenCode、DeepSeek、OMP、Pi</b> 的会话按项目收好；用 Git
-              worktree 隔离并行，用注意力中心告诉你谁在等你。一个窗口，数据留在本机。
+              把六个 Agent 的会话按项目收好；worktree 隔离并行，琥珀色提醒<span class="nw">谁在等你</span>。数据留在本机。
             </p>
             <div class="cta-row">
               <a class="btn btn-primary btn-moving magnetic" href="#get">
@@ -193,13 +195,8 @@
               <i class="dot dot-amber pulse"></i>
               <span class="hero-live-label">现在在等你</span>
               <span class="flip" id="heroFlip" aria-hidden="true"><span>Claude Code</span></span>
-              <span class="hero-live-note">示意 · 琥珀 = 有人在等</span>
+              <span class="hero-live-note">示意</span>
             </div>
-            <ul class="hero-meta">
-              <li><span class="kbd">⌘</span><span class="kbd">K</span> 命令面板</li>
-              <li><i class="dot dot-mint"></i> worktree 隔离并行</li>
-              <li><i class="dot dot-violet"></i> 数据留在本机</li>
-            </ul>
           </div>
 
           <div class="hero-visual" id="heroVisual" aria-hidden="true">
@@ -219,7 +216,7 @@
               </div>
               <div class="term-body">
                 <div class="term-cwd"><span class="tpath">~/VibeCodeProjects/keban</span><span class="tbranch">main</span></div>
-                <div class="term-cmd"><span class="tprompt">›</span> <span id="typeText">把三个 Agent 收进一个窗口，别让它们互相打架。</span><i class="caret" id="typeCaret"></i></div>
+                <div class="term-cmd"><span class="tprompt">›</span> <span id="typeText">修登录、补测试、调研依赖——别让它们互相打架。</span><i class="caret" id="typeCaret"></i></div>
                 <div class="term-rows" id="termRows">
                   <div class="trow" data-row>
                     <span class="tstate tstate-run"></span>
@@ -239,12 +236,6 @@
                     <span class="tsess">调研依赖升级 · 等你确认</span>
                     <span class="ttag ttag-wait">等你确认</span>
                   </div>
-                  <div class="trow trow-dim" data-row>
-                    <span class="tstate"></span>
-                    <img class="tlogo" src="assets/agents/deepseek.svg" alt="" width="16" height="16" />
-                    <span class="tsess">grpc 超限 · 2 天前</span>
-                    <span class="ttag ttag-idle">已归档</span>
-                  </div>
                 </div>
                 <div class="term-foot">
                   <span><i class="dot dot-mint"></i>2 运行中</span>
@@ -252,11 +243,6 @@
                   <span class="tspacer"></span>
                   <span class="tfoot-hint">⌘K 找回现场</span>
                 </div>
-              </div>
-              <div class="term-toast" id="termToast">
-                <span class="toast-dot"></span>
-                <div><b>Pi 在等你确认</b><small>keban · 调研依赖升级</small></div>
-                <button class="toast-close" id="toastClose" type="button" aria-label="关闭提醒"><svg class="ic" aria-hidden="true"><use href="#i-close" /></svg></button>
               </div>
             </div>
             <div class="float-chip chip-1"><span class="kbd">⌘</span><span class="kbd">K</span> 找回现场</div>
@@ -297,15 +283,60 @@
         </div>
       </section>
 
-      <section class="reveal-shot" id="control-room">
-        <div class="shot-sticky">
-          <div class="wrap shot-head">
-            <span class="eyebrow rv">THE WORKBENCH</span>
-            <h2 class="rv">一个窗口，<span class="serif-accent">整个工作现场</span></h2>
-            <p class="rv">左栏按项目展开会话，中栏跑 Agent，右侧 dock 的四面——工作树、文件、Git、shell 各占一面。没有标题栏，没有工具栏，三栏直接铺满。</p>
-            <p class="shot-note rv">浅色为默认外观 · <span class="kbd">⇧</span><span class="kbd">⌘</span><span class="kbd">D</span> 即时切换明暗</p>
+      <section class="story-section" id="control-room">
+        <div class="story-sticky">
+          <div class="wrap story-head">
+            <span class="eyebrow rv">FROM TERMINALS TO ONE WINDOW</span>
+            <h2 class="story-title">
+              <span class="sr-only">以前，十几个终端里找不到那次会话；现在，一个窗口全部归位。</span>
+              <span class="story-caps" aria-hidden="true">
+                <span class="story-cap cap-before"><small>以前</small>十几个终端，<br />找不到那次会话。</span>
+                <span class="story-cap cap-after"><small>现在</small>一个窗口，<br />全部归位。</span>
+              </span>
+            </h2>
+            <p class="story-lede rv">终端还在，只是终于有了目录。</p>
           </div>
-          <div class="shot-stage" id="shotStage">
+
+          <div class="story-stage" id="storyStage">
+            <div class="chaos" id="chaos" aria-hidden="true">
+              <div class="chaos-card ct-1" style="--x: 3%; --y: 10%; --r: -7deg">
+                <div class="ct-bar"><i></i><i></i><i></i><span>claude · keban</span></div>
+                <pre>› 帮我排查 grpc 超限…</pre>
+              </div>
+              <div class="chaos-card ct-2" style="--x: 18%; --y: 58%; --r: 5deg">
+                <div class="ct-bar"><i></i><i></i><i></i><span>codex</span></div>
+                <pre>$ codex resume
+? 选哪一个…</pre>
+              </div>
+              <div class="chaos-card ct-3" style="--x: 38%; --y: 4%; --r: -3deg">
+                <div class="ct-bar"><i></i><i></i><i></i><span>opencode</span></div>
+                <pre>› fix login bug</pre>
+              </div>
+              <div class="chaos-card ct-4" style="--x: 50%; --y: 42%; --r: 8deg">
+                <div class="ct-bar"><i></i><i></i><i></i><span>claude --resume</span></div>
+                <pre>No conversation
+found with id</pre>
+              </div>
+              <div class="chaos-card ct-5" style="--x: 76%; --y: 12%; --r: -8deg">
+                <div class="ct-bar"><i></i><i></i><i></i><span>pi</span></div>
+                <pre>› 重构 trace 模块</pre>
+              </div>
+              <div class="chaos-card ct-6" style="--x: 5%; --y: 70%; --r: 4deg">
+                <div class="ct-bar"><i></i><i></i><i></i><span>zsh</span></div>
+                <pre>~/marketing $ _</pre>
+              </div>
+              <div class="chaos-card ct-7" style="--x: 70%; --y: 68%; --r: -5deg">
+                <div class="ct-bar"><i></i><i></i><i></i><span>deepseek</span></div>
+                <pre>› 看下 Doris 慢查询</pre>
+              </div>
+              <div class="chaos-card chaos-note" style="--x: 24%; --y: 28%; --r: -3deg">
+                <span>上次那个会话在哪？</span>
+              </div>
+              <div class="chaos-card chaos-note" style="--x: 46%; --y: 82%; --r: 3deg">
+                <span>两个 Agent 改了同一个文件？！</span>
+              </div>
+            </div>
+
             <div class="shot-frame" id="shotFrame">
               <div class="shot-chrome">
                 <span class="tdot tdot-r"></span><span class="tdot tdot-y"></span><span class="tdot tdot-g"></span>
@@ -323,6 +354,7 @@
               />
               <div class="shot-scan" aria-hidden="true"></div>
             </div>
+
             <div class="shot-orbit" aria-hidden="true">
               <span class="orbit-chip oc-1"><i class="dot dot-mint"></i> 3 个标签并行</span>
               <span class="orbit-chip oc-2"><svg class="ic"><use href="#i-branch" /></svg> worktree</span>
@@ -336,9 +368,9 @@
       <section class="section bento-section" id="capabilities">
         <div class="wrap">
           <div class="section-head center">
-            <span class="eyebrow rv">ONE ROOM, SIX AGENTS</span>
-            <h2 class="rv">六个 Agent，<span class="serif-accent">一间控制室</span></h2>
-            <p class="rv">看得见、隔得开、回得来。CodeBay 不接管你的数据，只把并行的现场收拾干净。</p>
+            <span class="eyebrow rv">EIGHT HABITS, ONE ROOM</span>
+            <h2 class="rv">八个日常，<span class="serif-accent">一间控制室</span></h2>
+            <p class="rv">看得见、隔得开、回得来。不接管数据，只把并行的现场收拾干净。</p>
           </div>
 
           <div class="bento">
@@ -346,7 +378,7 @@
               <div class="card-spot" aria-hidden="true"></div>
               <header class="card-head">
                 <span class="card-ico"><svg class="ic"><use href="#i-folder" /></svg></span>
-                <div><h3>一个项目，所有会话</h3><p>JSONL、SQLite、zstd 的差异收在适配层里，统一成「项目 + 标题 + 时间 + 可恢复性」。只索引元数据，不复制对话。</p></div>
+                <div><h3>一个项目，所有会话</h3><p>JSONL、SQLite、zstd 的差异收在适配层；只索引元数据与可恢复性，不复制对话。</p></div>
               </header>
               <div class="mock-proj">
                 <div class="proj-head"><svg class="ic chev"><use href="#i-chevron" /></svg><b>keban</b><span class="branch-pill">main</span><span class="live"><i class="dot dot-mint"></i>3 运行中</span></div>
@@ -361,7 +393,7 @@
               <div class="card-spot" aria-hidden="true"></div>
               <header class="card-head">
                 <span class="card-ico"><svg class="ic"><use href="#i-branch" /></svg></span>
-                <div><h3>一条分支，一份 checkout</h3><p>隔离不是承诺，是文件系统的事实。三个 Agent 三个目录，互不覆盖；跨仓库还能组成工作树组，共用一条分支。</p></div>
+                <div><h3>一条分支，一份 checkout</h3><p>三个 Agent 三个目录，互不覆盖；跨仓库还能组成工作树组，共用一条分支。</p></div>
               </header>
               <div class="worktree-mock">
                 <div class="wt-root"><svg class="ic"><use href="#i-folder" /></svg> .worktrees/</div>
@@ -392,15 +424,13 @@
               <div class="card-spot" aria-hidden="true"></div>
               <header class="card-head">
                 <span class="card-ico"><svg class="ic"><use href="#i-git" /></svg></span>
-                <div><h3>从改完到可提交</h3><p>已暂存 / 未暂存 / 未跟踪 / 冲突，四区分明；行内、并排两种 diff。</p></div>
+                <div><h3>从改完到可提交</h3><p>四区变更、行内 / 并排 diff；AI 可以写提交信息，按不按提交由你。</p></div>
               </header>
               <div class="diff-mock">
                 <div class="diff-line"><span class="dl-file">internal/auth/sso.go</span><span class="dl-add">+42</span><span class="dl-del">−7</span></div>
                 <div class="diff-line diff-add"><span>+</span> if state := req.URL.Query().Get("state"); state != "" {</div>
                 <div class="diff-line diff-del"><span>−</span> if req.URL.Query().Get("state") == nil {</div>
                 <div class="diff-line diff-add"><span>+</span>   if err := verify(state, cfg.Secret); err != nil {</div>
-                <div class="diff-line diff-add"><span>+</span>     return http.StatusUnauthorized</div>
-                <div class="diff-line"><span>&nbsp;</span>   }</div>
                 <div class="diff-commit"><svg class="ic"><use href="#i-spark" /></svg> feat(auth): 支持 SSO 回调与状态校验</div>
               </div>
             </article>
@@ -409,7 +439,7 @@
               <div class="card-spot" aria-hidden="true"></div>
               <header class="card-head">
                 <span class="card-ico"><span class="kbd">⌘</span><span class="kbd">K</span></span>
-                <div><h3>找回现场，只要一次按键</h3><p>空查询列出每个项目最近 3 条可恢复会话；有查询时同时搜会话标题与文件路径。↑↓ 移动，↩ 打开。</p></div>
+                <div><h3>找回现场，只要一次按键</h3><p>空查询每项目 3 条可恢复会话；查询同时搜会话与文件。↑↓ 选择，↩ 打开。</p></div>
               </header>
               <div class="palette-mock">
                 <div class="pal-search"><svg class="ic"><use href="#i-search" /></svg><span>grpc</span><span class="pal-esc">Esc</span></div>
@@ -425,7 +455,7 @@
               <div class="card-spot" aria-hidden="true"></div>
               <header class="card-head">
                 <span class="card-ico"><svg class="ic"><use href="#i-layers" /></svg></span>
-                <div><h3>Agent 无关</h3><p>Agent 会换，工作现场不该换。插件是数据，不是代码。</p></div>
+                <div><h3>Agent 无关</h3><p>六个适配器、八个建议与任意 JSON 插件，共用一个项目视图。</p></div>
               </header>
               <div class="orbit-mock" aria-hidden="true">
                 <span class="orbit-core"><svg class="ic"><use href="#i-cpu" /></svg></span>
@@ -442,7 +472,7 @@
               <div class="card-spot" aria-hidden="true"></div>
               <header class="card-head">
                 <span class="card-ico"><svg class="ic"><use href="#i-file" /></svg></span>
-                <div><h3>插件是数据，不是代码</h3><p>一份 JSON 描述 CLI，添加前先在本机逐项实测。</p></div>
+                <div><h3>插件是数据，不是代码</h3><p>一份 JSON 描述 CLI；写 → 检查 → 实测，通过才允许接入。</p></div>
               </header>
               <div class="plugin-mock">
                 <div class="plugin-file"><span class="plugin-name">aider.codebayagent</span><span class="plugin-type">JSON</span></div>
@@ -457,7 +487,7 @@
               <div class="card-spot" aria-hidden="true"></div>
               <header class="card-head">
                 <span class="card-ico"><svg class="ic"><use href="#i-shield" /></svg></span>
-                <div><h3>数据留在本机</h3><p>默认不联网，无账号，无遥测。索引只存元数据，SQLite 一律只读打开；网络只用于你主动配置的 AI 端点与插件链接。</p></div>
+                <div><h3>数据留在本机</h3><p>默认不联网，无账号、无遥测。索引只存元数据，SQLite 只读；网络只用于你配置的 AI 端点与插件链接。</p></div>
               </header>
               <div class="local-grid">
                 <div><svg class="ic"><use href="#i-shield" /></svg><b>无账号 · 无遥测</b><small>只有你主动点击时才会联网</small></div>
@@ -474,15 +504,15 @@
           <div class="attention-copy">
             <span class="eyebrow rv">ATTENTION, NOT POLLING</span>
             <h2 class="rv">Agent 找人，<br />不是人找 Agent</h2>
-            <p class="rv">每个终端 Agent 都会把状态写进标题。CodeBay 读标题判断谁在等你——不装 hook、不改 shell、不接你的 Agent。</p>
+            <p class="rv">每个终端 Agent 都会把状态写进标题。CodeBay 读标题判断谁在等你——不装 hook、不改 shell。</p>
             <ul class="channel-list rv">
-              <li><span class="ch-ico ch-amber"><i class="dot dot-amber"></i></span><div><b>琥珀标签</b><small>等你回应的会话，标签变琥珀；去看了就清除</small></div></li>
+              <li><span class="ch-ico ch-amber"><i class="dot dot-amber"></i></span><div><b>琥珀标签</b><small>等你回应的会话变琥珀，去看了就清除</small></div></li>
               <li><span class="ch-ico"><svg class="ic"><use href="#i-volume" /></svg></span><div><b>提示音</b><small>系统 Glass 音，短促、不重复</small></div></li>
-              <li><span class="ch-ico"><svg class="ic"><use href="#i-layers" /></svg></span><div><b>Dock 弹跳</b><small>最不容易错过的一个</small></div></li>
-              <li><span class="ch-ico"><svg class="ic"><use href="#i-bell" /></svg></span><div><b>通知中心</b><small>点一下直接回到对应会话，跨项目、跨窗口</small></div></li>
+              <li><span class="ch-ico"><svg class="ic"><use href="#i-layers" /></svg></span><div><b>Dock 弹跳</b><small>最不容易错过</small></div></li>
+              <li><span class="ch-ico"><svg class="ic"><use href="#i-bell" /></svg></span><div><b>通知中心</b><small>可选，点击跳回对应会话</small></div></li>
               <li><span class="ch-ico"><svg class="ic"><use href="#i-spark" /></svg></span><div><b>Dock 徽标</b><small>只统计你还没看到的会话数</small></div></li>
             </ul>
-            <p class="fine rv">阈值默认 8 秒，可调 3–60 秒；纯 shell 永远不会被提醒。已经看见的会话不再打扰。</p>
+            <p class="fine rv">阈值默认 8 秒，可调 3–60 秒；纯 shell 永不提醒，看过的会话不再打扰。</p>
           </div>
 
           <div class="attention-demo rv" id="attDemo">
@@ -541,23 +571,23 @@
             <span class="eyebrow rv">RECORD / 2026-09</span>
             <h2 class="rv">数字不吹牛</h2>
             <p class="paper-serif rv">Recorded, not marketed.</p>
-            <p class="rv">本机样本，可复查的工程记录。样本与条件写在每个数字下面。</p>
+            <p class="rv">本机样本，条件写在每个数字下面。</p>
           </div>
           <div class="stat-grid">
             <div class="stat rv">
               <b class="stat-num" data-count="0.6" data-dec="1" data-suffix=" s">0.6 s</b>
               <span class="stat-label">扫完 371 MB 会话</span>
-              <small>173 个 rollout · 同一台机器从 9.1 秒降到 0.6 秒</small>
+              <small>173 个 rollout · 9.1s → 0.6s</small>
             </div>
             <div class="stat rv">
               <b class="stat-num" data-count="0" data-dec="0" data-suffix=" %">0 %</b>
               <span class="stat-label">空闲 CPU</span>
-              <small>空闲时 watcher 限流，会话运行期间不重扫</small>
+              <small>watcher 空闲限流，运行期间不重扫</small>
             </div>
             <div class="stat rv">
               <b class="stat-num" data-count="280" data-dec="0" data-prefix="≈" data-suffix=" MB">≈280 MB</b>
               <span class="stat-label">物理占用</span>
-              <small>业务常驻堆约 25.6 MB · 2026-09 Release 本机样本</small>
+              <small>常驻堆约 25.6 MB · Release 本机样本</small>
             </div>
             <div class="stat rv">
               <b class="stat-num" data-count="6" data-dec="0" data-suffix=" + 8">6 + 8</b>
@@ -567,15 +597,15 @@
             <div class="stat rv">
               <b class="stat-num" data-count="781" data-dec="0" data-suffix=" × 2">781 × 2</b>
               <span class="stat-label">条界面文案</span>
-              <small>中英两套，切换立即生效；键集合与占位符由测试钉死</small>
+              <small>中英两套，立即切换；键集合由测试钉死</small>
             </div>
             <div class="stat rv">
               <b class="stat-num" data-count="8" data-dec="0" data-suffix=" s">8 s</b>
               <span class="stat-label">注意力安静阈值</span>
-              <small>默认 8 秒，可调 3–60 秒；纯 shell 永不提醒</small>
+              <small>可调 3–60 秒；纯 shell 永不提醒</small>
             </div>
           </div>
-          <p class="stat-note rv">另有约 4.6 万行自研 Swift、55 个测试源文件与 39 个离屏 UI 回归场景。数据来自本机验收记录，不是宣传口径。</p>
+          <p class="stat-note rv">另有约 4.6 万行自研 Swift、55 个测试源文件与 39 个离屏 UI 场景。</p>
         </div>
       </section>
 
@@ -584,14 +614,14 @@
           <div class="section-head center">
             <span class="eyebrow rv">LIGHT UP YOUR CITY</span>
             <h2 class="rv">把你的城市点亮</h2>
-            <p class="rv">点击地图，在任意陆地留下一个光点。预置光点为示意数据，不代表真实用户分布。</p>
+            <p class="rv">点击陆地，留下你的光点。预置光点为示意数据。</p>
           </div>
           <div class="map-shell rv">
             <canvas id="map" width="1440" height="560" role="img" aria-label="世界点阵地图，点击陆地可以点亮一个城市光点"></canvas>
             <noscript><p class="map-noscript">地图交互需要 JavaScript。CodeBay 没有服务器节点，地图只是示意。</p></noscript>
             <div class="map-glow" aria-hidden="true"></div>
             <div class="map-bar">
-              <span class="map-hint"><svg class="ic"><use href="#i-globe" /></svg> 点击地图，留下你的光点</span>
+              <span class="map-hint"><svg class="ic"><use href="#i-globe" /></svg> 示意地图 · 没有服务器节点</span>
               <button class="map-random" id="mapRandom" type="button"><svg class="ic"><use href="#i-spark" /></svg> 随机点亮一座城市</button>
               <span class="map-count">已点亮 <b id="cnt">14</b> 座城市</span>
             </div>
@@ -603,32 +633,31 @@
         <div class="wrap">
           <div class="section-head center">
             <span class="eyebrow rv">THREE STEPS</span>
-            <h2 class="rv">三步，搭起你的工作现场</h2>
-            <p class="rv">macOS 14+ · 未签名测试版 · 数据全部留在本机</p>
+            <h2 class="rv">三步开始</h2>
           </div>
           <ol class="steps">
             <li class="step rv">
               <span class="step-num">01</span>
               <div class="step-body">
-                <span class="step-kbd"><span class="kbd">⌘</span><span class="kbd">O</span> 添加项目</span>
+                <span class="step-kbd">DMG / install.sh</span>
                 <h3>安装并打开</h3>
-                <p>下载 DMG，或运行 install.sh。首次打开请在 Finder 里右键「打开」——当前是 ad-hoc 签名的测试版。</p>
+                <p>下载 DMG 或运行 install.sh；首次打开请右键「打开」。</p>
               </div>
             </li>
             <li class="step rv">
               <span class="step-num">02</span>
               <div class="step-body">
-                <span class="step-kbd"><span class="kbd">⇧</span><span class="kbd">⌘</span><span class="kbd">N</span> 新建会话</span>
+                <span class="step-kbd"><span class="kbd">⌘</span><span class="kbd">O</span></span>
                 <h3>添加项目</h3>
-                <p>选一个代码目录，CodeBay 会索引里面所有 Agent 的历史会话；Agent CLI 需要你自己安装并登录。</p>
+                <p>选一个代码目录，索引已有会话；Agent CLI 需自行安装并登录。</p>
               </div>
             </li>
             <li class="step rv">
               <span class="step-num">03</span>
               <div class="step-body">
-                <span class="step-kbd"><span class="kbd">⌘</span><span class="kbd">K</span> 找回现场</span>
+                <span class="step-kbd"><span class="kbd">⇧</span><span class="kbd">⌘</span><span class="kbd">N</span> / <span class="kbd">⌘</span><span class="kbd">K</span></span>
                 <h3>开始，或者恢复</h3>
-                <p>一句话可以同时交给几个 Agent，每个 worktree 一条分支；关掉窗口也不丢会话。</p>
+                <p>一句话可同时交给几个 Agent；关掉窗口也不丢会话。</p>
               </div>
             </li>
           </ol>
@@ -640,7 +669,7 @@
           <div class="faq-head">
             <span class="eyebrow rv">FAQ</span>
             <h2 class="rv">常见问题</h2>
-            <p class="rv">没有魔法，也没有隐藏的联网。装之前先把边界说清楚。</p>
+            <p class="rv">装之前，先把边界说清楚。</p>
             <a class="faq-more rv" href="https://github.com/go-kenka/codebay-site/issues">还有别的问题？到 GitHub 开 issue <svg class="ic" aria-hidden="true"><use href="#i-arrow" /></svg></a>
           </div>
           <div class="faq-list" id="faqList">
@@ -648,49 +677,49 @@
               <button class="faq-q" type="button" aria-expanded="true">
                 <span>会改动我的会话文件吗？</span><svg class="ic" aria-hidden="true"><use href="#i-chevron" /></svg>
               </button>
-              <div class="faq-a"><div><p>不会。CodeBay 只读索引各 Agent 的原生会话文件，不复制、不改写；会话的创建与清理由各 CLI 自己负责。扫描 SQLite 一律只读打开，表名列名先校验再引用。</p></div></div>
+              <div class="faq-a"><div><p>不会。只读索引各 Agent 的原生会话文件，不复制、不改写；会话由各 CLI 自己管理。扫描 SQLite 只读，表名列名先校验再引用。</p></div></div>
             </div>
             <div class="faq-item rv">
               <button class="faq-q" type="button" aria-expanded="false">
                 <span>会上传我的会话或代码吗？</span><svg class="ic" aria-hidden="true"><use href="#i-chevron" /></svg>
               </button>
-              <div class="faq-a"><div><p>默认不会：没有账号、没有遥测。只有你主动使用内置 AI 功能（例如改写提示词、生成提交信息）或从 https 链接导入插件时，才会连接你自己配置的地址。</p></div></div>
+              <div class="faq-a"><div><p>默认不会：没有账号、没有遥测。只有你主动使用内置 AI 或导入 https 插件时，才会连接你配置的地址。</p></div></div>
             </div>
             <div class="faq-item rv">
               <button class="faq-q" type="button" aria-expanded="false">
                 <span>支持哪些 Agent？</span><svg class="ic" aria-hidden="true"><use href="#i-chevron" /></svg>
               </button>
-              <div class="faq-a"><div><p>内置 Claude Code、Codex、OpenCode、DeepSeek、OMP、Pi；另有 8 个可探测建议（Aider、Goose、Crush、Gemini CLI、Qwen Code、Cursor CLI、Amp、gptme）。其他 Agent 可以用一份 JSON 插件接入，添加前会在本机实测。</p></div></div>
+              <div class="faq-a"><div><p>内置 Claude Code、Codex、OpenCode、DeepSeek、OMP、Pi；另有 8 个可探测建议。其他 CLI 用一份 JSON 插件接入，添加前会在本机实测。</p></div></div>
             </div>
             <div class="faq-item rv">
               <button class="faq-q" type="button" aria-expanded="false">
                 <span>多个 Agent 并行会不会互相覆盖？</span><svg class="ic" aria-hidden="true"><use href="#i-chevron" /></svg>
               </button>
-              <div class="faq-a"><div><p>不会。CodeBay 用一个分支一份 Git worktree 隔离并行会话；跨仓库任务还可以组成「工作树组」，共用一条分支和同一个真实目录。不参与的仓库是不在这个目录里，而不是被拦住——这是软隔离，不是安全沙箱。</p></div></div>
+              <div class="faq-a"><div><p>不会。一条分支一份 Git worktree；跨仓库任务可组成「工作树组」，共用一条分支与一个目录。这是软隔离，不是安全沙箱。</p></div></div>
             </div>
             <div class="faq-item rv">
               <button class="faq-q" type="button" aria-expanded="false">
                 <span>从 Finder 启动，找不到 claude 命令怎么办？</span><svg class="ic" aria-hidden="true"><use href="#i-chevron" /></svg>
               </button>
-              <div class="faq-a"><div><p>CodeBay 启动时会用登录 shell 探测一次真实的 PATH，再叠加 Homebrew、npm 全局与常见安装目录兜底，从 Finder 启动也能找到；解析不到时会给出带解决方法的错误，而不是静默失败。</p></div></div>
+              <div class="faq-a"><div><p>启动时用登录 shell 探测真实 PATH，并叠加常见安装目录；解析不到时会给出带解决方法的错误。</p></div></div>
             </div>
             <div class="faq-item rv">
               <button class="faq-q" type="button" aria-expanded="false">
                 <span>已经被清理的会话还能恢复吗？</span><svg class="ic" aria-hidden="true"><use href="#i-chevron" /></svg>
               </button>
-              <div class="faq-a"><div><p>无法恢复。CodeBay 会检查文件是否还在，把它标成不可恢复并说明原因（例如 Transcript is gone），而不是启动一个注定失败的进程。</p></div></div>
+              <div class="faq-a"><div><p>无法恢复。CodeBay 会标成不可恢复并说明原因（例如 Transcript is gone），而不是启动一个注定失败的进程。</p></div></div>
             </div>
             <div class="faq-item rv">
               <button class="faq-q" type="button" aria-expanded="false">
                 <span>会接管我的 Git 吗？</span><svg class="ic" aria-hidden="true"><use href="#i-chevron" /></svg>
               </button>
-              <div class="faq-a"><div><p>不会。Git 能力止于 commit：没有 push、pull、merge、rebase、PR 或冲突解决编辑器；暂存是文件级，diff 只读，预览只读。push、PR 与合并仍在你的终端里完成。</p></div></div>
+              <div class="faq-a"><div><p>不会。Git 能力止于 commit：没有 push、pull、merge、rebase、PR 或冲突解决编辑器；暂存是文件级，diff 与预览只读。</p></div></div>
             </div>
             <div class="faq-item rv">
               <button class="faq-q" type="button" aria-expanded="false">
                 <span>没有 Apple 签名，怎么安装？</span><svg class="ic" aria-hidden="true"><use href="#i-chevron" /></svg>
               </button>
-              <div class="faq-a"><div><p>预览版是 ad-hoc 签名，macOS 会提示“无法验证开发者”。安装后在 Finder 里右键 CodeBay →「打开」即可；也可以使用 <a href="install.sh">install.sh</a>，它会按芯片选择 Apple Silicon 或 Intel 安装包，下载、校验、ad-hoc 签名并安装到 ~/Applications。这只是测试版的分发方式，不等于正式签名。</p></div></div>
+              <div class="faq-a"><div><p>预览版是 ad-hoc 签名，macOS 会提示「无法验证开发者」。首次打开请右键「打开」，或用 <a href="install.sh">install.sh</a> 按芯片选择安装包并完成签名安装。正式签名与公证仍在筹备中。</p></div></div>
             </div>
           </div>
         </div>
@@ -705,7 +734,7 @@
         <div class="wrap get-inner">
           <span class="eyebrow rv">GET CODEBAY</span>
           <h2 class="rv">把会话收进 <span class="serif-accent">CodeBay</span></h2>
-          <p class="get-lede rv">macOS 14+ · 当前是未签名测试版：Apple Silicon 与 Intel 分开编译，不混入同一份二进制。</p>
+          <p class="get-lede rv">macOS 14+ · 未签名测试版。Apple Silicon 与 Intel 分开编译。</p>
           <div class="dl-grid">
             <a class="dl-card rv magnetic" href="https://github.com/go-kenka/codebay-site/releases/download/v0.1.0/CodeBay-arm64.dmg">
               <span class="dl-ico"><svg class="ic"><use href="#i-download" /></svg></span>
@@ -730,7 +759,7 @@
             <code id="installCmd">curl -fsSL https://go-kenka.github.io/codebay-site/install.sh | bash -s -- --allow-unsigned</code>
             <button class="copy-btn" id="copyInstall" type="button"><svg class="ic"><use href="#i-copy" /></svg><span>复制</span></button>
           </div>
-          <p class="fine rv">脚本会按芯片选择安装包、ad-hoc 签名并清除隔离属性；仅在你信任该构建时使用。正式签名与公证版仍在筹备中。</p>
+          <p class="fine rv">脚本按芯片下载、ad-hoc 签名并清除隔离属性；仅在你信任该构建时使用。</p>
           <div class="get-links rv">
             <a href="#faq">安装与安全说明</a>
             <span>·</span>
@@ -755,12 +784,12 @@
           <nav class="footer-links" aria-label="页脚导航">
             <div><b>产品</b><a href="#control-room">工作现场</a><a href="#capabilities">能力</a><a href="#attention">注意力中心</a><a href="#numbers">数字</a></div>
             <div><b>获取</b><a href="#get">下载</a><a href="install.sh">安装脚本</a><a href="https://github.com/go-kenka/codebay-site">GitHub</a><a href="#faq">常见问题</a><a href="#top">回到顶部</a></div>
-            <div><b>说明</b><span>Swift 6 + SwiftUI</span><span>macOS 14+</span><span>数据留在本机</span><span>未签名测试版</span></div>
+            <div><b>说明</b><span>Swift 6 + SwiftUI</span><span>macOS 14+</span><span>数据留在本机</span></div>
           </nav>
         </div>
         <p class="footer-word" aria-hidden="true">CODEBAY</p>
         <div class="footer-bottom">
-          <span>© 2026 CodeBay · 未签名测试版 · 界面截图为开发版</span>
+          <span>© 2026 CodeBay · 界面截图为开发版</span>
           <span>本页不加载任何外部 CDN、字体或统计脚本 · 视觉组件灵感来自 <a href="https://ui.aceternity.com/components">Aceternity UI</a></span>
         </div>
       </div>

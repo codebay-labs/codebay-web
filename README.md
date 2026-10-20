@@ -15,6 +15,8 @@ CodeBay 的产品主页，纯静态站点（HTML + CSS + 原生 JS，无构建�
 视觉方向是「深空控制室 + 纸面验收记录」：暗色海面负责氛围，纸面段只放可复查的数字，琥珀只表示「有 Agent 在等你」。
 颜色语义：紫罗兰 = 品牌与背景光，薄荷 = 运行中，琥珀 = 等待/被看见；除此以外不装饰性用色。
 
+中段用一段 sticky 滚动叙事把老问题演出来：十几个散落的终端在滚动中聚拢、淡出，随后 CodeBay 主界面从中心扶正——「以前找不到会话，现在一个窗口全部归位」。该段同时用到 Container Scroll Animation 的倾斜/放大手势与自定义的终端汇聚编排。
+
 组件参照 [Aceternity UI](https://ui.aceternity.com/components) 的公开示例，全部用原生 HTML/CSS/JS 重写，没有引入 React、Tailwind 或任何 npm 依赖：
 
 - [Spotlight](https://ui.aceternity.com/components/spotlight)
