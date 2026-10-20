@@ -198,13 +198,13 @@
                 <span class="term-kbd"><span class="kbd">⌘</span><span class="kbd">K</span></span>
               </div>
               <div class="term-tabs">
-                <span class="ttab active"><i class="dot dot-mint"></i>keban · claude</span>
-                <span class="ttab"><i class="dot dot-mint"></i>keban · codex</span>
-                <span class="ttab"><i class="dot dot-amber"></i>xd-trace · pi</span>
+                <span class="ttab active"><i class="dot dot-mint"></i>atlas-api · claude</span>
+                <span class="ttab"><i class="dot dot-mint"></i>atlas-api · codex</span>
+                <span class="ttab"><i class="dot dot-amber"></i>nova-web · pi</span>
                 <span class="ttab ttab-add">+</span>
               </div>
               <div class="term-body">
-                <div class="term-cwd"><span class="tpath">~/VibeCodeProjects/keban</span><span class="tbranch">main</span></div>
+                <div class="term-cwd"><span class="tpath">~/Code/atlas-api</span><span class="tbranch">main</span></div>
                 <div class="term-cmd"><span class="tprompt">›</span> <span id="typeText">修登录、补测试、调研依赖——别让它们互相打架。</span><i class="caret" id="typeCaret"></i></div>
                 <div class="term-rows" id="termRows">
                   <div class="trow" data-row>
@@ -289,7 +289,7 @@
           <div class="story-stage" id="storyStage">
             <div class="chaos" id="chaos" aria-hidden="true">
               <div class="chaos-card ct-1" style="--x: 3%; --y: 10%; --r: -7deg">
-                <div class="ct-bar"><i></i><i></i><i></i><span>claude · keban</span></div>
+                <div class="ct-bar"><i></i><i></i><i></i><span>claude · atlas-api</span></div>
                 <pre>› 帮我排查 grpc 超限…</pre>
               </div>
               <div class="chaos-card ct-2" style="--x: 18%; --y: 58%; --r: 5deg">
@@ -312,7 +312,7 @@ found with id</pre>
               </div>
               <div class="chaos-card ct-6" style="--x: 5%; --y: 70%; --r: 4deg">
                 <div class="ct-bar"><i></i><i></i><i></i><span>zsh</span></div>
-                <pre>~/marketing $ _</pre>
+                <pre>~/paper-trail $ _</pre>
               </div>
               <div class="chaos-card ct-7" style="--x: 70%; --y: 68%; --r: -5deg">
                 <div class="ct-bar"><i></i><i></i><i></i><span>deepseek</span></div>
@@ -329,12 +329,12 @@ found with id</pre>
             <div class="shot-frame" id="shotFrame">
               <div class="shot-chrome">
                 <span class="tdot tdot-r"></span><span class="tdot tdot-y"></span><span class="tdot tdot-g"></span>
-                <span class="shot-url">CodeBay — 三个 Agent，一个窗口</span>
+                <span class="shot-url">CodeBay — 界面示意</span>
                 <span class="shot-badge"><i class="dot dot-amber"></i> 1 等你确认</span>
               </div>
               <img
                 class="shot-img"
-                alt="CodeBay 主界面：左栏按项目组织会话，中栏运行 Agent，右侧是工作树、文件、Git 与终端 dock"
+                alt="CodeBay 主界面示意图：左栏按项目组织会话，中栏运行 Agent，右侧是工作树、文件、Git 与终端 dock"
                 width="2000"
                 height="1172"
                 src="assets/shots/hero.webp"
@@ -369,7 +369,7 @@ found with id</pre>
                 <div><h3>一个项目，所有会话</h3><p>JSONL、SQLite、zstd 的差异收在适配层；只索引元数据与可恢复性，不复制对话。</p></div>
               </header>
               <div class="mock-proj">
-                <div class="proj-head"><svg class="ic chev"><use href="#i-chevron" /></svg><b>keban</b><span class="branch-pill">main</span><span class="live"><i class="dot dot-mint"></i>3 运行中</span></div>
+                <div class="proj-head"><svg class="ic chev"><use href="#i-chevron" /></svg><b>atlas-api</b><span class="branch-pill">main</span><span class="live"><i class="dot dot-mint"></i>3 运行中</span></div>
                 <div class="sess-row"><img src="assets/agents/claudecode.svg" alt="" width="16" height="16" /><span class="sess-name">修登录 · SSO 回调死循环</span><span class="sess-meta">Claude Code · 3 分钟前</span><span class="ttag ttag-run">运行中</span></div>
                 <div class="sess-row"><img src="assets/agents/codex.svg" alt="" width="16" height="16" /><span class="sess-name">补认证测试 · 三个用例</span><span class="sess-meta">Codex · 12 分钟前</span><span class="ttag ttag-run">运行中</span></div>
                 <div class="sess-row"><img src="assets/agents/pi.svg" alt="" width="16" height="16" /><span class="sess-name">调研依赖升级</span><span class="sess-meta">Pi · 28 分钟前</span><span class="ttag ttag-wait">等你确认</span></div>
@@ -432,10 +432,10 @@ found with id</pre>
               <div class="palette-mock">
                 <div class="pal-search"><svg class="ic"><use href="#i-search" /></svg><span>grpc</span><span class="pal-esc">Esc</span></div>
                 <div class="pal-group">会话 · 2</div>
-                <div class="pal-row pal-active"><span class="pal-icon"><svg class="ic"><use href="#i-terminal" /></svg></span><div><b>grpc 超限分群拉取失败</b><small>keban · DeepSeek · 2 天前</small></div><span class="pal-enter">↩</span></div>
-                <div class="pal-row"><span class="pal-icon"><svg class="ic"><use href="#i-terminal" /></svg></span><div><b>grpc 重试策略与超时</b><small>xd-trace · Codex · 昨天</small></div></div>
+                <div class="pal-row pal-active"><span class="pal-icon"><svg class="ic"><use href="#i-terminal" /></svg></span><div><b>grpc 超限分群拉取失败</b><small>atlas-api · DeepSeek · 2 天前</small></div><span class="pal-enter">↩</span></div>
+                <div class="pal-row"><span class="pal-icon"><svg class="ic"><use href="#i-terminal" /></svg></span><div><b>grpc 重试策略与超时</b><small>nova-web · Codex · 昨天</small></div></div>
                 <div class="pal-group">文件 · 1</div>
-                <div class="pal-row"><span class="pal-icon"><svg class="ic"><use href="#i-file" /></svg></span><div><b>internal/grpc/client.go</b><small>keban · 128 行</small></div></div>
+                <div class="pal-row"><span class="pal-icon"><svg class="ic"><use href="#i-file" /></svg></span><div><b>internal/grpc/client.go</b><small>atlas-api · 128 行</small></div></div>
               </div>
             </article>
 
@@ -507,12 +507,12 @@ found with id</pre>
             <div class="demo-window">
               <div class="demo-bar">
                 <span class="tdot tdot-r"></span><span class="tdot tdot-y"></span><span class="tdot tdot-g"></span>
-                <span class="demo-title">keban — Claude Code</span>
+                <span class="demo-title">atlas-api — Claude Code</span>
                 <span class="demo-state" id="demoState"><i class="dot dot-mint"></i><span>运行中</span></span>
               </div>
               <div class="demo-body">
                 <div class="demo-term" id="demoTerm">
-                  <div class="dline dim">~/VibeCodeProjects/keban <span class="tbranch">main</span></div>
+                  <div class="dline dim">~/Code/atlas-api <span class="tbranch">main</span></div>
                   <div class="dline"><span class="tprompt">›</span> 修一下 SSO 回调的死循环，顺便补三个测试</div>
                   <div class="dline dim" data-demo-line>● 读取 internal/auth/sso.go</div>
                   <div class="dline dim" data-demo-line>● 修改 4 个文件 · 运行 go test ./internal/auth</div>
@@ -532,7 +532,7 @@ found with id</pre>
 
             <div class="demo-notify" id="demoNotify">
               <div class="notify-head"><img src="assets/logo.png" alt="" width="18" height="18" /><b>CodeBay</b><small>现在</small><button class="notify-x" id="demoNotifyClose" type="button" aria-label="关闭通知"><svg class="ic"><use href="#i-close" /></svg></button></div>
-              <p><b>Claude Code 在等你确认</b><span>keban · 修登录 · SSO 回调死循环</span></p>
+              <p><b>Claude Code 在等你确认</b><span>atlas-api · 修登录 · SSO 回调死循环</span></p>
               <div class="notify-actions"><button type="button" class="notify-go" id="demoGo">去看看</button><button type="button" class="notify-later" id="demoLater">稍后</button></div>
             </div>
 

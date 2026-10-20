@@ -7,7 +7,7 @@ CodeBay 的产品主页，纯静态站点（HTML + CSS + 原生 JS，无构建�
 - 脚本：`main.js`
 - 字体：`assets/fonts/`（Manrope / Instrument Serif / JetBrains Mono，SIL OFL）
 - Agent 图标：`assets/agents/`
-- 界面截图：`assets/shots/hero.webp`（开发版浅色界面）
+- 界面示意：`assets/shots/hero.webp`（虚构项目 `atlas-api`，非真实用户截图；生成源 `Scripts/hero-mock.html`）
 - 未签名预览安装脚本：`install.sh`（下载、校验、ad-hoc 签名、安装）
 
 ## 设计
@@ -15,6 +15,8 @@ CodeBay 的产品主页，纯静态站点（HTML + CSS + 原生 JS，无构建�
 视觉方向是「暖石墨工作台 + 纸面验收记录」：暗色 workbench 负责氛围，纸面段只放可复查的数字，琥珀只表示「有 Agent 在等你」。
 配色以 [Radix Colors](https://www.radix-ui.com/colors) 的 Sand 灰阶打底，Amber / Jade / Red 只做语义色；surface / border 的分层参照 [Geist Design System](https://vercel.com/geist/colors)。没有紫色、青色、渐变文字和大面积玻璃。
 完整色板、字体、圆角、动效与组件规则见 **[DESIGN.md](DESIGN.md)**，改视觉之前先改它。
+
+界面示意由 [Scripts/hero-mock.html](../Scripts/hero-mock.html) 生成：在仓库根目录起静态服务，打开 `/Scripts/hero-mock.html`，以 2x 截图得到 2000×1172，再导出 `hero.webp` 与 `hero-og.png`。
 
 中段用一段 sticky 滚动叙事把老问题演出来：十几个散落的终端在滚动中聚拢、淡出，随后 CodeBay 主界面从中心扶正——「以前找不到会话，现在一个窗口全部归位」。该段同时用到 Container Scroll Animation 的倾斜/放大手势与自定义的终端汇聚编排。
 
