@@ -9,7 +9,7 @@
       content="CodeBay 是 macOS 原生的 AI 编程 Agent 会话中枢：按项目收好 Claude Code、Codex、OpenCode、DeepSeek、OMP、Pi 的会话，用 Git worktree 隔离并行，用注意力中心告诉你谁在等你。数据留在本机。"
     />
     <meta name="author" content="CodeBay" />
-    <meta name="theme-color" content="#05070c" />
+    <meta name="theme-color" content="#111110" />
     <link rel="canonical" href="https://go-kenka.github.io/codebay-site/" />
     <meta name="color-scheme" content="dark" />
     <meta property="og:title" content="CodeBay – 把并行的 Agent，收进一个工作现场" />
@@ -25,7 +25,7 @@
     <meta property="og:image:height" content="1172" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://go-kenka.github.io/codebay-site/assets/shots/hero-og.png" />
-    <link rel="icon" type="image/png" href="assets/logo.png" />
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
     <link rel="apple-touch-icon" href="assets/logo.png" />
     <link rel="preload" as="image" href="assets/shots/hero.webp" type="image/webp" />
     <link rel="preload" href="assets/fonts/manrope.woff2" as="font" type="font/woff2" crossorigin />
@@ -42,7 +42,7 @@
     <link rel="stylesheet" href="style.css" />
     <noscript>
       <style>
-        .nav { background: rgba(5, 7, 12, 0.92); border-bottom-color: var(--line); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+        .nav { background: rgba(17, 17, 16, 0.92); border-bottom-color: var(--line); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
         .story-section { height: auto; padding: 96px 0; }
         .story-sticky { position: relative; height: auto; padding-top: 0; }
         .chaos, .story-cap.cap-before { display: none; }
@@ -101,7 +101,7 @@
       <div class="nav-inner">
         <a class="brand" href="#top" aria-label="CodeBay 首页">
           <span class="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><rect width="24" height="24" rx="7" fill="url(#brandGrad)" /><path d="M8.5 8.5L5.5 12l3 3.5M15.5 8.5l3 3.5-3 3.5" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round" /><defs><linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b3a7ff" /><stop offset="1" stop-color="#6b5bff" /></linearGradient></defs></svg>
+            <svg viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#eeeeec" /><path d="M8.5 8.5L5.5 12l3 3.5M15.5 8.5l3 3.5-3 3.5" stroke="#111110" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>
           </span>
           <span class="brand-name">CodeBay</span>
         </a>
@@ -126,26 +126,23 @@
     <main id="main">
       <section class="hero" id="hero">
         <div class="hero-bg" aria-hidden="true">
-          <div class="aurora aurora-a"></div>
-          <div class="aurora aurora-b"></div>
-          <div class="aurora aurora-c"></div>
           <div class="grid-mesh"></div>
           <svg class="beams" viewBox="0 0 1440 720" preserveAspectRatio="none">
             <defs>
               <linearGradient id="beamA" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stop-color="#8b7bff" stop-opacity="0" />
-                <stop offset="0.45" stop-color="#a89bff" stop-opacity="0.55" />
-                <stop offset="1" stop-color="#8b7bff" stop-opacity="0" />
+                <stop offset="0" stop-color="#eeeeec" stop-opacity="0" />
+                <stop offset="0.45" stop-color="#eeeeec" stop-opacity="0.2" />
+                <stop offset="1" stop-color="#eeeeec" stop-opacity="0" />
               </linearGradient>
               <linearGradient id="beamB" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stop-color="#5eead4" stop-opacity="0" />
-                <stop offset="0.5" stop-color="#7ee7db" stop-opacity="0.36" />
-                <stop offset="1" stop-color="#5eead4" stop-opacity="0" />
+                <stop offset="0" stop-color="#eeeeec" stop-opacity="0" />
+                <stop offset="0.5" stop-color="#eeeeec" stop-opacity="0.12" />
+                <stop offset="1" stop-color="#eeeeec" stop-opacity="0" />
               </linearGradient>
               <linearGradient id="beamC" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stop-color="#ffb45c" stop-opacity="0" />
-                <stop offset="0.5" stop-color="#ffcf8e" stop-opacity="0.24" />
-                <stop offset="1" stop-color="#ffb45c" stop-opacity="0" />
+                <stop offset="0" stop-color="#eeeeec" stop-opacity="0" />
+                <stop offset="0.5" stop-color="#eeeeec" stop-opacity="0.08" />
+                <stop offset="1" stop-color="#eeeeec" stop-opacity="0" />
               </linearGradient>
             </defs>
             <path class="beam beam-a" d="M-80 40C300 140 430 500 900 720" stroke="url(#beamA)" />
@@ -154,14 +151,6 @@
             <path class="beam beam-a" d="M60 760C330 520 700 460 1500 110" stroke="url(#beamA)" />
             <path class="beam beam-b" d="M-60 420C280 400 600 120 900 -60" stroke="url(#beamB)" />
           </svg>
-          <canvas class="sparkles" id="sparkles"></canvas>
-          <div class="meteors">
-            <i style="--x: 14%; --d: 0s; --t: 9s"></i>
-            <i style="--x: 32%; --d: -2.2s; --t: 11s"></i>
-            <i style="--x: 58%; --d: -5.4s; --t: 10s"></i>
-            <i style="--x: 76%; --d: -1.3s; --t: 12s"></i>
-            <i style="--x: 91%; --d: -7s; --t: 9.5s"></i>
-          </div>
           <div class="spotlight" id="spotlight"></div>
           <div class="hero-vignette"></div>
         </div>
@@ -352,7 +341,6 @@ found with id</pre>
                 loading="lazy"
                 decoding="async"
               />
-              <div class="shot-scan" aria-hidden="true"></div>
             </div>
 
             <div class="shot-orbit" aria-hidden="true">
@@ -774,7 +762,7 @@ found with id</pre>
         <div class="footer-top">
           <div class="footer-brand">
             <span class="brand-mark" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><rect width="24" height="24" rx="7" fill="url(#brandGrad2)" /><path d="M8.5 8.5L5.5 12l3 3.5M15.5 8.5l3 3.5-3 3.5" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round" /><defs><linearGradient id="brandGrad2" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b3a7ff" /><stop offset="1" stop-color="#6b5bff" /></linearGradient></defs></svg>
+              <svg viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#eeeeec" /><path d="M8.5 8.5L5.5 12l3 3.5M15.5 8.5l3 3.5-3 3.5" stroke="#111110" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>
             </span>
             <div>
               <p class="footer-quote">One developer. A team of agents. One workbench.</p>

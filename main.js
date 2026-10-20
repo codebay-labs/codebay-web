@@ -214,95 +214,6 @@ document.documentElement.classList.add("js");
       window.setTimeout(typeNext, 620);
     }
   }
-  (function sparkleField() {
-    var canvas = $("#sparkles");
-    if (!canvas) return;
-    var ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    var width = 0;
-    var height = 0;
-    var dpr = 1;
-    var stars = [];
-    var running = false;
-    var rafId = 0;
-    var lastPaint = 0;
-    var paint = function (time) {
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, width, height);
-      for (var i = 0; i < stars.length; i += 1) {
-        var star = stars[i];
-        var alpha = reduced
-          ? 0.42
-          : 0.16 + 0.52 * (0.5 + 0.5 * Math.sin((time / 1200) * star.s + star.p));
-        ctx.globalAlpha = alpha;
-        ctx.fillStyle = "#d9d3ff";
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.globalAlpha = 1;
-    };
-    var build = function () {
-      dpr = Math.min(2, window.devicePixelRatio || 1);
-      width = canvas.clientWidth;
-      height = canvas.clientHeight;
-      if (!width || !height) return;
-      canvas.width = Math.round(width * dpr);
-      canvas.height = Math.round(height * dpr);
-      var count = clamp(Math.round((width * height) / 30000), 18, 70);
-      stars = [];
-      for (var i = 0; i < count; i += 1) {
-        stars.push({
-          x: Math.random() * width,
-          y: Math.random() * height,
-          r: Math.random() * 1.1 + 0.25,
-          p: Math.random() * Math.PI * 2,
-          s: 0.5 + Math.random() * 0.9,
-        });
-      }
-      if (reduced) paint(0);
-    };
-    var loop = function (time) {
-      if (!running) return;
-      if (time - lastPaint > 40) {
-        lastPaint = time;
-        paint(time);
-      }
-      rafId = window.requestAnimationFrame(loop);
-    };
-    var start = function () {
-      if (reduced || running) return;
-      running = true;
-      rafId = window.requestAnimationFrame(loop);
-    };
-    var stop = function () {
-      running = false;
-      if (rafId) window.cancelAnimationFrame(rafId);
-      rafId = 0;
-    };
-    build();
-    if (reduced) {
-      paint(0);
-    } else {
-      new IntersectionObserver(
-        function (entries) {
-          if (entries[0].isIntersecting) start();
-          else stop();
-        },
-        { threshold: 0.01 }
-      ).observe(hero || canvas);
-      document.addEventListener("visibilitychange", function () {
-        if (document.hidden) stop();
-        else start();
-      });
-      var resizeTimer = 0;
-      window.addEventListener("resize", function () {
-        window.clearTimeout(resizeTimer);
-        resizeTimer = window.setTimeout(build, 180);
-      });
-    }
-  })();
-
   var storySection = $(".story-section");
   var storyStage = $("#storyStage");
   var storyFrame = $("#shotFrame");
@@ -732,8 +643,8 @@ document.documentElement.classList.add("js");
       baseCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
       baseCtx.clearRect(0, 0, width, height);
       var gradient = baseCtx.createLinearGradient(0, 0, 0, height);
-      gradient.addColorStop(0, "rgba(175,185,210,.26)");
-      gradient.addColorStop(1, "rgba(140,150,180,.11)");
+      gradient.addColorStop(0, "rgba(238,238,236,.20)");
+      gradient.addColorStop(1, "rgba(238,238,236,.08)");
       baseCtx.fillStyle = gradient;
       for (var i = 0; i < cells.length; i += 1) {
         var dot = cells[i];
@@ -760,7 +671,7 @@ document.documentElement.classList.add("js");
           var midY =
             (hub[1] + target[1]) / 2 -
             Math.hypot(target[0] - hub[0], target[1] - hub[1]) * 0.24;
-          ctx.strokeStyle = "rgba(139,123,255,.16)";
+          ctx.strokeStyle = "rgba(238,238,236,.12)";
           ctx.lineWidth = 1;
           ctx.beginPath();
           ctx.moveTo(hub[0], hub[1]);
@@ -776,8 +687,8 @@ document.documentElement.classList.add("js");
             inverse * inverse * hub[1] +
             2 * inverse * ratio * midY +
             ratio * ratio * target[1];
-          ctx.fillStyle = "rgba(235,238,255,.92)";
-          ctx.shadowColor = "rgba(139,123,255,.95)";
+          ctx.fillStyle = "rgba(238,238,236,.9)";
+          ctx.shadowColor = "rgba(238,238,236,.9)";
           ctx.shadowBlur = 9;
           ctx.beginPath();
           ctx.arc(x, y, Math.max(0.8, cell * 0.26), 0, Math.PI * 2);
@@ -790,22 +701,22 @@ document.documentElement.classList.add("js");
         var spot = point(item);
         if (!reduced) {
           var phase = (time / 1800 + item.ph) % 1;
-          ctx.strokeStyle = "rgba(139,123,255," + (0.42 * (1 - phase)).toFixed(3) + ")";
+          ctx.strokeStyle = "rgba(238,238,236," + (0.32 * (1 - phase)).toFixed(3) + ")";
           ctx.lineWidth = 1;
           ctx.beginPath();
           ctx.arc(spot[0], spot[1], cell * (0.7 + phase * 3.4), 0, Math.PI * 2);
           ctx.stroke();
           var age = (time - item.t0) / 900;
           if (age >= 0 && age < 1) {
-            ctx.strokeStyle = "rgba(255,255,255," + (1 - age).toFixed(3) + ")";
+            ctx.strokeStyle = "rgba(255,197,61," + (1 - age).toFixed(3) + ")";
             ctx.beginPath();
             ctx.arc(spot[0], spot[1], cell * (1 + age * 8), 0, Math.PI * 2);
             ctx.stroke();
           }
         }
         var preset = j < CITY.length;
-        ctx.fillStyle = preset ? "rgba(179,167,255,.95)" : "rgba(255,196,120,.95)";
-        ctx.shadowColor = preset ? "#8b7bff" : "#ffb45c";
+        ctx.fillStyle = preset ? "rgba(238,238,236,.95)" : "rgba(255,197,61,.95)";
+        ctx.shadowColor = preset ? "#eeeeec" : "#ffc53d";
         ctx.shadowBlur = 12;
         ctx.beginPath();
         ctx.arc(spot[0], spot[1], cell * 0.5, 0, Math.PI * 2);
