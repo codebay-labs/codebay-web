@@ -1,174 +1,657 @@
 document.documentElement.classList.add("js");
+
 (function () {
-  var reduce = matchMedia("(prefers-reduced-motion:reduce)").matches;
-  // headline split
-  document.querySelectorAll("h1 .l").forEach(function (l, li) {
-    var t = l.textContent,
-      m = t.match(/[A-Za-z]+|\s+|./g) || [];
-    l.textContent = "";
-    m.forEach(function (c, i) {
-      if (/^\s+$/.test(c)) {
-        l.appendChild(document.createTextNode(" "));
-        return;
-      }
-      var s = document.createElement("span");
-      s.className = "w";
-      s.textContent = c;
-      s.style.setProperty("--i", li * 7 + i);
-      l.appendChild(s);
-    });
-  });
-  // hero spotlight
-  var hero = document.getElementById("hero");
-  hero.addEventListener("pointermove", function (e) {
-    var r = hero.getBoundingClientRect();
-    hero.style.setProperty("--mx", e.clientX - r.left + "px");
-    hero.style.setProperty("--my", e.clientY - r.top + "px");
-  });
-  // reveal + card spotlight
-  var io = new IntersectionObserver(
-    function (es) {
-      es.forEach(function (e) {
-        if (e.isIntersecting) {
-          e.target.classList.add("in");
-          io.unobserve(e.target);
-        }
-      });
-    },
-    { threshold: 0.2 },
-  );
-  document.querySelectorAll(".rv").forEach(function (el, i) {
-    el.style.transitionDelay =
-      (el.classList.contains("pair") ? (i % 4) * 80 : 0) + "ms";
-    io.observe(el);
-  });
-  document.querySelectorAll(".pair").forEach(function (p) {
-    p.addEventListener("pointermove", function (e) {
-      var r = p.getBoundingClientRect();
-      p.style.setProperty("--x", e.clientX - r.left + "px");
-      p.style.setProperty("--y", e.clientY - r.top + "px");
-    });
-  });
-  // scroll story
-  var story = document.getElementById("story"),
-    pin = document.getElementById("pin"),
-    shot = document.getElementById("shot"),
-    capA = document.getElementById("capA"),
-    capB = document.getElementById("capB"),
-    prog = document.getElementById("prog");
-  var items = [].slice.call(document.querySelectorAll("#field .mt"));
-  function cl(v) {
-    return Math.max(0, Math.min(1, v));
-  }
-  function sm(a, b, v) {
-    var t = cl((v - a) / (b - a));
+  "use strict";
+
+  var root = document.documentElement;
+  var motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var reduced = motionQuery.matches;
+  var noHover = window.matchMedia("(hover: none)").matches;
+  var $ = function (sel, scope) {
+    return (scope || document).querySelector(sel);
+  };
+  var $$ = function (sel, scope) {
+    return Array.prototype.slice.call((scope || document).querySelectorAll(sel));
+  };
+  var clamp = function (value, low, high) {
+    return Math.min(high, Math.max(low, value));
+  };
+  var smooth = function (t) {
     return t * t * (3 - 2 * t);
-  }
-  function lerp(a, b, t) {
-    return a + (b - a) * t;
-  }
-  var ticking = false;
-  function update() {
-    ticking = false;
-    var d = document.documentElement,
-      max = d.scrollHeight - innerHeight;
-    prog.style.transform = "scaleX(" + (max > 0 ? scrollY / max : 0) + ")";
-    if (reduce) return;
-    var r = story.getBoundingClientRect(),
-      total = story.offsetHeight - innerHeight,
-      p = cl(-r.top / total),
-      W = pin.clientWidth,
-      H = pin.clientHeight;
-    var e = sm(0, 0.55, p),
-      fade = 1 - sm(0.3, 0.6, p);
-    items.forEach(function (el, i) {
-      var x0 = (+el.dataset.x / 100) * W,
-        y0 = (+el.dataset.y / 100) * H,
-        r0 = +el.dataset.r;
-      var w = el.offsetWidth,
-        h = el.offsetHeight;
-      var x = lerp(x0, W / 2, e) - w / 2,
-        y = lerp(y0, H * 0.62, e) - h / 2,
-        rot = lerp(r0, 0, e),
-        sc = lerp(1, 0.3, e);
-      el.style.transform =
-        "translate(" +
-        x +
-        "px," +
-        y +
-        "px) rotate(" +
-        rot +
-        "deg) scale(" +
-        sc +
-        ")";
-      el.style.opacity = fade;
-    });
-    var s = sm(0.42, 0.86, p);
-    shot.style.opacity = s;
-    shot.style.filter = "blur(" + (1 - s) * 14 + "px)";
-    shot.style.transform =
-      "translate(-50%,-50%) perspective(1600px) rotateX(" +
-      (1 - s) * 14 +
-      "deg) scale(" +
-      lerp(0.78, 1, s) +
-      ")";
-    var k = sm(0.4, 0.56, p);
-    capA.style.opacity = 1 - k;
-    capB.style.opacity = k;
-    capA.style.transform = "translateY(" + -k * 14 + "px)";
-    capB.style.transform = "translateY(" + (1 - k) * 14 + "px)";
-  }
-  function req() {
-    if (!ticking) {
-      ticking = true;
-      requestAnimationFrame(update);
+  };
+
+  var scrollers = [];
+  var scrollQueued = false;
+  function runScroll() {
+    scrollQueued = false;
+    var max = root.scrollHeight - window.innerHeight;
+    for (var i = 0; i < scrollers.length; i += 1) {
+      scrollers[i](window.scrollY, max);
     }
   }
-  addEventListener("scroll", req, { passive: true });
-  addEventListener("resize", req);
-  update();
+  function requestScroll() {
+    if (!scrollQueued) {
+      scrollQueued = true;
+      window.requestAnimationFrame(runScroll);
+    }
+  }
+  window.addEventListener("scroll", requestScroll, { passive: true });
+  window.addEventListener("resize", requestScroll);
 
-  // stats count-up
-  var cio = new IntersectionObserver(
-    function (es) {
-      es.forEach(function (e) {
-        if (!e.isIntersecting) return;
-        cio.unobserve(e.target);
-        e.target.querySelectorAll("b").forEach(function (b) {
-          var n = +b.dataset.n,
-            d = +b.dataset.d,
-            t0 = performance.now();
-          function f(t) {
-            var k = reduce ? 1 : Math.min(1, (t - t0) / 1400),
-              v = n * (1 - Math.pow(1 - k, 3));
-            b.textContent = v.toFixed(d);
-            if (k < 1) requestAnimationFrame(f);
-          }
-          requestAnimationFrame(f);
+  var nav = $("#nav");
+  var progress = $("#progressBar");
+  scrollers.push(function (y, max) {
+    if (nav) nav.classList.toggle("scrolled", y > 24);
+    if (progress) progress.style.transform = "scaleX(" + (max > 0 ? y / max : 0) + ")";
+  });
+
+  var burger = $("#navBurger");
+  if (nav && burger) {
+    var setMenu = function (open) {
+      nav.classList.toggle("open", open);
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+      burger.setAttribute("aria-label", open ? "关闭菜单" : "打开菜单");
+    };
+    burger.addEventListener("click", function () {
+      setMenu(!nav.classList.contains("open"));
+    });
+    $$(".nav-links a").forEach(function (link) {
+      link.addEventListener("click", function () {
+        setMenu(false);
+      });
+    });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") setMenu(false);
+    });
+  }
+
+  var revealItems = $$(".rv");
+  if (reduced || !("IntersectionObserver" in window)) {
+    revealItems.forEach(function (el) {
+      el.classList.add("in");
+    });
+  } else {
+    var revealObserver = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("in");
+          revealObserver.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -5% 0px" }
+    );
+    revealItems.forEach(function (el) {
+      var delay = el.dataset.rv ? Number(el.dataset.rv) * 80 : 0;
+      el.style.setProperty("--rvd", delay + "ms");
+      revealObserver.observe(el);
+    });
+  }
+
+  var titleLines = $$(".hero-title .tg");
+  if (titleLines.length) {
+    if (reduced) {
+      titleLines.forEach(function (line) {
+        line.classList.add("in");
+      });
+    } else {
+      var order = 0;
+      titleLines.forEach(function (line) {
+        if (line.classList.contains("grad-text")) {
+          line.classList.add("tg-line");
+          return;
+        }
+        var chars = Array.from(line.textContent);
+        line.textContent = "";
+        var fragment = document.createDocumentFragment();
+        chars.forEach(function (char) {
+          var span = document.createElement("span");
+          span.className = "ch";
+          span.textContent = char === " " ? "\u00a0" : char;
+          span.style.setProperty("--d", String(order));
+          order += 1;
+          fragment.appendChild(span);
+        });
+        line.appendChild(fragment);
+      });
+      window.requestAnimationFrame(function () {
+        window.requestAnimationFrame(function () {
+          titleLines.forEach(function (line) {
+            line.classList.add("in");
+          });
         });
       });
-    },
-    { threshold: 0.4 },
-  );
-  var st = document.querySelector(".stats");
-  if (st) cio.observe(st);
-  // light-up map
-  var MAP =
-      "000000000000000000000000000100110011111111001111111111111111111100000000000001110000000000000000000000000000000011000000000000000000000000000000|000000000000000000000001001010011001000000001111111111111111111100000000000000000000000000000000111000000000000111111000000000000000000000000000|000000000000000000000011110000000011010000000000001111111111111100000000000000000000000000000110000000000111111111111000000000001000000000000000|100000000100000000000000011111000110111111100000000111111111111000000000000000000000000000000110000111011111111111111111111101111111100000000000|000001111111111111111111110101000011101100111000000111111111100000000000000000011111111000000101111010111111111111111111111111111111111111111111|111100111111111111111111111111111111110000111110000111111100000001000000000001111111110100111111111111111111111111111111111111111111111111111111|000000001111111111111111111111111111010100011100000111110000000010000000000011110111111111111111111111111111111111111111111111111111111111111110|000000111111111111111111111111111100000001100000000011100000000000000000001111100111111111111111111111111111111111111111111111111111111011111000|000000011110000001111111111111111110000001111110000000000000000000000000001111100111111111111111111111111111111111111111111111111000000010000000|000000001000000000011111111111111111100001111110000000000000000000000010000101001111111111111111111111111111111111111111111111100000001110000000|000000000000000000001111111111111111111011111111100000000000000000001101000111111111111111111111111111111111111111111111111111110000001100000000|000000000000000000000111111111111111111111111111110000000000000000000011111111111111111111111111111111111111111111111111111111110000000000000000|000000000000000000000011111111111111111111110100111000000000000000000011111111111111111111111111111111111111111111111111111111110000000000000000|000000000000000000000011111111111111111111111100000000000000000000000001111111111111010111110111111111111111111111111111111111100000000000000000|000000000000000000000011111111111111111111110000000000000000000000000001111010111110000011101111111111111111111111111111111111000100000000000000|000000000000000000000011111111111111111111100000000000000000000000001111100001101111011011110011111111111111111111111111111100001000000000000000|000000000000000000000001111111111111111111000000000000000000000000001111000000101001111111110011111111111111111111111110001000001000000000000000|000000000000000000000001111111111111111111000000000000000000000000000000111100000000011111111111111111111111111111111111000100110000000000000000|000000000000000000000000011111111111111110000000000000000000000000000111111100000000001111111111111111111111111111111111000001000000000000000000|000000000000000000000000010111111111111000000000000000000000000000001111111111101110101111111111111111111111111111111111100000000000000000000000|000000000000000000000000001111111100000100000000000000000000000000001111111111111111111111101111111111111111111111111111100000000000000000000000|000000000000000000000000000011111000000100000000000000000000000000111111111111111111110111110011111111111111111111111111000000000000000000000000|000000000000000000000000000001111000000000000000000000000000000000111111111111111111110111111110000111111111111111111110100000000000000000000000|000000000000000000000000000000111000100000000000000000000000000001111111111111111111111011111111000011111110011111100000000000000000000000000000|000000000000000000000000000000111101100000011000000000000000000000111111111111111111111011111110000001111100001111010000000000000000000000000000|000000000000000000000000000000000111100000000000000000000000000001111111111111111111111101111000000001111000000111100000100000000000000000000000|000000000000000000000000000000000000111000000000000000000000000001111111111111111111111111100000000000110000000111110000110000000000000000000000|000000000000000000000000000000000000000000101000000000000000000000111111111111111111111110010000000000110000000101100000000000000000000000000000|000000000000000000000000000000000000000101111111000000000000000000011111111111111111111111110000000000000000000100000000001000000000000000000000|000000000000000000000000000000000000000001111111100000000000000000001111101111111111111111110000000000001000000010000000000000000000000000000000|000000000000000000000000000000000000000001111111111100000000000000000000000011111111111111100000000000000000000110000110000000000000000000000000|000000000000000000000000000000000000000011111111111100000000000000000000000011111111111111000000000000000000000011001110000000000000000000000000|000000000000000000000000000000000000000011111111111111000000000000000000000011111111111110000000000000000000000011001110100011000000000000000000|000000000000000000000000000000000000000011111111111111111000000000000000000011111111111100000000000000000000000001000000100000111100000000000000|000000000000000000000000000000000000000011111111111111111100000000000000000001111111111100000000000000000000000000100000000000011110000000000000|000000000000000000000000000000000000000011111111111111111100000000000000000001111111111100000000000000000000000000000001101000001000000000000000|000000000000000000000000000000000000000001111111111111111000000000000000000001111111111100000000000000000000000000000000000000000000000000000000|000000000000000000000000000000000000000001111111111111110000000000000000000001111111111100010000000000000000000000000000000011000000000000000000|000000000000000000000000000000000000000000011111111111110000000000000000000001111111111100110000000000000000000000000000011111100100000000000000|000000000000000000000000000000000000000000001111111111110000000000000000000001111111110000110000000000000000000000000000011111111110000000000000|000000000000000000000000000000000000000000001111111111110000000000000000000001111111110001100000000000000000000000000011111111111111000000000000|000000000000000000000000000000000000000000001111111111000000000000000000000000111111110001100000000000000000000000000111111111111111000000000000|000000000000000000000000000000000000000000001111111110000000000000000000000000111111100000000000000000000000000000000111111111111111100000000000|000000000000000000000000000000000000000000011111111100000000000000000000000000011111100000000000000000000000000000000011111111111111100000000000|000000000000000000000000000000000000000000011111111100000000000000000000000000011111000000000000000000000000000000000011111111111111100000000000|000000000000000000000000000000000000000000011111111000000000000000000000000000011100000000000000000000000000000000000011110000111111100000000000|000000000000000000000000000000000000000000011111100000000000000000000000000000000000000000000000000000000000000000000000000000001111000000000000|000000000000000000000000000000000000000000011111000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000010|000000000000000000000000000000000000000000111100000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000100|000000000000000000000000000000000000000000011100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000|000000000000000000000000000000000000000000111000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000|000000000000000000000000000000000000000000111000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000|000000000000000000000000000000000000000000110000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000|000000000000000000000000000000000000000000011000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000|000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000|000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000".split(
-        "|",
-      ),
-    C = 144,
-    R = 56,
-    cv = document.getElementById("map");
-  if (cv) {
-    var cx = cv.getContext("2d"),
-      dpr = 1,
-      W = 0,
-      H = 0,
-      cs = 0,
-      base = null,
-      vis = false,
-      cnt = document.getElementById("cnt");
+    }
+  }
+
+  var hero = $("#hero");
+  var spotlight = $("#spotlight");
+  if (hero && spotlight && !noHover && !reduced) {
+    var targetX = 50;
+    var targetY = 18;
+    var currentX = 50;
+    var currentY = 18;
+    var spotlightRunning = false;
+    var drift = function () {
+      spotlightRunning = false;
+      currentX += (targetX - currentX) * 0.12;
+      currentY += (targetY - currentY) * 0.12;
+      spotlight.style.setProperty("--mx", currentX + "%");
+      spotlight.style.setProperty("--my", currentY + "%");
+      if (Math.abs(targetX - currentX) > 0.08 || Math.abs(targetY - currentY) > 0.08) {
+        spotlightRunning = true;
+        window.requestAnimationFrame(drift);
+      }
+    };
+    hero.addEventListener(
+      "pointermove",
+      function (event) {
+        var box = hero.getBoundingClientRect();
+        targetX = ((event.clientX - box.left) / box.width) * 100;
+        targetY = ((event.clientY - box.top) / box.height) * 100;
+        if (!spotlightRunning) {
+          spotlightRunning = true;
+          window.requestAnimationFrame(drift);
+        }
+      },
+      { passive: true }
+    );
+  }
+
+  var heroVisual = $("#heroVisual");
+  var heroTerm = $("#heroTerm");
+  if (heroVisual && heroTerm && !noHover && !reduced) {
+    var termBox = null;
+    heroVisual.addEventListener("pointerenter", function () {
+      termBox = heroTerm.getBoundingClientRect();
+      heroTerm.style.transition = "transform .18s ease-out";
+    });
+    heroVisual.addEventListener(
+      "pointermove",
+      function (event) {
+        if (!termBox) termBox = heroTerm.getBoundingClientRect();
+        var px = (event.clientX - termBox.left) / termBox.width - 0.5;
+        var py = (event.clientY - termBox.top) / termBox.height - 0.5;
+        heroTerm.style.transform =
+          "rotateX(" + (-py * 5).toFixed(2) + "deg) rotateY(" + (px * 6).toFixed(2) + "deg)";
+      },
+      { passive: true }
+    );
+    heroVisual.addEventListener("pointerleave", function () {
+      heroTerm.style.transform = "";
+      heroTerm.style.transition = "";
+      termBox = null;
+    });
+  }
+
+  var typeEl = $("#typeText");
+  var caretEl = $("#typeCaret");
+  var rowsEl = $("#termRows");
+  var toastEl = $("#termToast");
+  var toastClose = $("#toastClose");
+  var phrase = "把三个 Agent 收进一个窗口，别让它们互相打架。";
+  if (typeEl && rowsEl) {
+    $$(".trow", rowsEl).forEach(function (row, index) {
+      row.style.setProperty("--rd", index * 110 + "ms");
+    });
+    if (reduced) {
+      typeEl.textContent = phrase;
+      if (caretEl) caretEl.style.display = "none";
+      rowsEl.classList.add("in");
+      if (toastEl) toastEl.classList.add("show");
+    } else {
+      typeEl.textContent = "";
+      var charIndex = 0;
+      var typeNext = function () {
+        if (charIndex <= phrase.length) {
+          typeEl.textContent = phrase.slice(0, charIndex);
+          charIndex += 1;
+          window.setTimeout(typeNext, charIndex < 4 ? 130 : 32);
+          return;
+        }
+        if (caretEl) caretEl.style.display = "none";
+        window.setTimeout(function () {
+          rowsEl.classList.add("in");
+        }, 280);
+        window.setTimeout(function () {
+          if (!toastEl) return;
+          toastEl.classList.add("show");
+          window.setTimeout(function () {
+            toastEl.classList.remove("show");
+          }, 9000);
+        }, 1600);
+      };
+      window.setTimeout(typeNext, 620);
+    }
+  }
+  if (toastClose && toastEl) {
+    toastClose.addEventListener("click", function () {
+      toastEl.classList.remove("show");
+    });
+  }
+
+  (function sparkleField() {
+    var canvas = $("#sparkles");
+    if (!canvas) return;
+    var ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    var width = 0;
+    var height = 0;
+    var dpr = 1;
+    var stars = [];
+    var running = false;
+    var rafId = 0;
+    var lastPaint = 0;
+    var paint = function (time) {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, width, height);
+      for (var i = 0; i < stars.length; i += 1) {
+        var star = stars[i];
+        var alpha = reduced
+          ? 0.42
+          : 0.16 + 0.52 * (0.5 + 0.5 * Math.sin((time / 1200) * star.s + star.p));
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = "#d9d3ff";
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    };
+    var build = function () {
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      width = canvas.clientWidth;
+      height = canvas.clientHeight;
+      if (!width || !height) return;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      var count = clamp(Math.round((width * height) / 30000), 18, 70);
+      stars = [];
+      for (var i = 0; i < count; i += 1) {
+        stars.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          r: Math.random() * 1.1 + 0.25,
+          p: Math.random() * Math.PI * 2,
+          s: 0.5 + Math.random() * 0.9,
+        });
+      }
+      if (reduced) paint(0);
+    };
+    var loop = function (time) {
+      if (!running) return;
+      if (time - lastPaint > 40) {
+        lastPaint = time;
+        paint(time);
+      }
+      rafId = window.requestAnimationFrame(loop);
+    };
+    var start = function () {
+      if (reduced || running) return;
+      running = true;
+      rafId = window.requestAnimationFrame(loop);
+    };
+    var stop = function () {
+      running = false;
+      if (rafId) window.cancelAnimationFrame(rafId);
+      rafId = 0;
+    };
+    build();
+    if (reduced) {
+      paint(0);
+    } else {
+      new IntersectionObserver(
+        function (entries) {
+          if (entries[0].isIntersecting) start();
+          else stop();
+        },
+        { threshold: 0.01 }
+      ).observe(hero || canvas);
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) stop();
+        else start();
+      });
+      var resizeTimer = 0;
+      window.addEventListener("resize", function () {
+        window.clearTimeout(resizeTimer);
+        resizeTimer = window.setTimeout(build, 180);
+      });
+    }
+  })();
+
+  var shotSection = $(".reveal-shot");
+  var shotFrame = $("#shotFrame");
+  var shotHead = $(".shot-head");
+  if (shotSection && shotFrame) {
+    var narrow = function () {
+      return window.innerWidth <= 820;
+    };
+    var paintShot = function (progress) {
+      var eased = smooth(clamp(progress / 0.82, 0, 1));
+      var maxTilt = narrow() ? 5 : 20;
+      var baseScale = narrow() ? 0.97 : 0.86;
+      var grow = narrow() ? 0.03 : 0.14;
+      shotFrame.style.setProperty("--rx", (maxTilt * (1 - eased)).toFixed(2) + "deg");
+      shotFrame.style.setProperty("--sc", (baseScale + grow * eased).toFixed(4));
+      shotFrame.style.setProperty("--ty", ((1 - eased) * (narrow() ? 40 : 70)).toFixed(1) + "px");
+      shotFrame.style.setProperty("--op", (0.45 + 0.55 * eased).toFixed(3));
+      if (shotHead) {
+        shotHead.style.setProperty("--headY", (-eased * 18).toFixed(1) + "px");
+      }
+    };
+    if (reduced) {
+      paintShot(1);
+      shotFrame.style.setProperty("--rx", "0deg");
+    } else {
+      scrollers.push(function () {
+        var rect = shotSection.getBoundingClientRect();
+        var total = shotSection.offsetHeight - window.innerHeight;
+        var progress = total > 0 ? clamp(-rect.top / total, 0, 1) : 1;
+        paintShot(progress);
+      });
+    }
+  }
+
+  $$(".bento-card").forEach(function (card) {
+    var spot = $(".card-spot", card);
+    if (!spot || noHover || reduced) return;
+    card.addEventListener(
+      "pointermove",
+      function (event) {
+        var box = card.getBoundingClientRect();
+        spot.style.setProperty("--x", event.clientX - box.left + "px");
+        spot.style.setProperty("--y", event.clientY - box.top + "px");
+      },
+      { passive: true }
+    );
+  });
+
+  if (!noHover && !reduced) {
+    $$(".magnetic").forEach(function (el) {
+      el.addEventListener(
+        "pointermove",
+        function (event) {
+          var box = el.getBoundingClientRect();
+          var x = (event.clientX - box.left - box.width / 2) / box.width;
+          var y = (event.clientY - box.top - box.height / 2) / box.height;
+          el.style.translate = (x * 5).toFixed(1) + "px " + (y * 4).toFixed(1) + "px";
+        },
+        { passive: true }
+      );
+      el.addEventListener("pointerleave", function () {
+        el.style.translate = "";
+      });
+    });
+  }
+
+  var demo = $("#attDemo");
+  if (demo) {
+    var stateLabel = $("#demoState span");
+    var demoNotify = $("#demoNotify");
+    var demoGo = $("#demoGo");
+    var demoLater = $("#demoLater");
+    var demoReplay = $("#demoReplay");
+    var demoClose = $("#demoNotifyClose");
+    var demoTimers = [];
+    var demoVisible = false;
+    var defer = function (fn, ms) {
+      demoTimers.push(window.setTimeout(fn, ms));
+    };
+    var clearDemoTimers = function () {
+      demoTimers.forEach(function (id) {
+        window.clearTimeout(id);
+      });
+      demoTimers = [];
+    };
+    var setDemoPhase = function (phase) {
+      demo.classList.toggle("att-working", phase === "working");
+      demo.classList.toggle("att-waiting", phase === "waiting");
+      demo.classList.toggle("att-cleared", phase === "cleared");
+      if (stateLabel) {
+        stateLabel.textContent =
+          phase === "waiting" ? "等待确认" : phase === "cleared" ? "已读" : "运行中";
+      }
+      if (demoNotify) demoNotify.style.display = "";
+    };
+    var cycleDemo = function () {
+      clearDemoTimers();
+      if (!demoVisible) return;
+      if (reduced) {
+        setDemoPhase("waiting");
+        return;
+      }
+      setDemoPhase("working");
+      defer(function () {
+        setDemoPhase("waiting");
+      }, 2600);
+      defer(function () {
+        setDemoPhase("cleared");
+      }, 8200);
+      defer(cycleDemo, 11200);
+    };
+    new IntersectionObserver(
+      function (entries) {
+        demoVisible = entries[0].isIntersecting;
+        if (demoVisible) cycleDemo();
+        else clearDemoTimers();
+      },
+      { threshold: 0.3 }
+    ).observe(demo);
+    if (demoGo) {
+      demoGo.addEventListener("click", function () {
+        clearDemoTimers();
+        setDemoPhase("cleared");
+        if (demoVisible) defer(cycleDemo, 3800);
+      });
+    }
+    if (demoClose && demoNotify) {
+      demoClose.addEventListener("click", function () {
+        demoNotify.style.display = "none";
+      });
+    }
+    if (demoLater && demoNotify) {
+      demoLater.addEventListener("click", function () {
+        demoNotify.style.display = "none";
+      });
+    }
+    if (demoReplay) {
+      demoReplay.addEventListener("click", function () {
+        cycleDemo();
+      });
+    }
+  }
+
+  var navAnchors = $$(".nav-links a");
+  if (navAnchors.length && "IntersectionObserver" in window) {
+    var spy = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          var id = entry.target.getAttribute("id");
+          navAnchors.forEach(function (link) {
+            link.classList.toggle("active", link.getAttribute("href") === "#" + id);
+          });
+        });
+      },
+      { rootMargin: "-38% 0px -52% 0px", threshold: 0 }
+    );
+    ["control-room", "capabilities", "attention", "faq"].forEach(function (id) {
+      var section = document.getElementById(id);
+      if (section) spy.observe(section);
+    });
+  }
+
+  var heroFlip = $("#heroFlip");
+  if (heroFlip && !reduced) {
+    var flipWords = ["Claude Code", "Codex", "OpenCode", "DeepSeek", "OMP", "Pi"];
+    var flipIndex = 0;
+    var flipTimer = 0;
+    var flipNext = function () {
+      var current = heroFlip.firstElementChild;
+      if (!current) return;
+      flipIndex = (flipIndex + 1) % flipWords.length;
+      var next = document.createElement("span");
+      next.textContent = flipWords[flipIndex];
+      next.className = "in";
+      heroFlip.appendChild(next);
+      void next.offsetWidth;
+      next.classList.remove("in");
+      current.classList.add("out");
+      window.setTimeout(function () {
+        if (current.parentNode) current.parentNode.removeChild(current);
+      }, 560);
+    };
+    var startFlip = function () {
+      if (flipTimer) return;
+      flipTimer = window.setInterval(flipNext, 2800);
+    };
+    var stopFlip = function () {
+      if (!flipTimer) return;
+      window.clearInterval(flipTimer);
+      flipTimer = 0;
+    };
+    new IntersectionObserver(
+      function (entries) {
+        if (entries[0].isIntersecting) startFlip();
+        else stopFlip();
+      },
+      { threshold: 0.1 }
+    ).observe(heroFlip);
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) stopFlip();
+      else startFlip();
+    });
+  }
+
+  var statGrid = $(".stat-grid");
+  if (statGrid) {
+    var statNums = $$(".stat-num", statGrid);
+    var countUp = function () {
+      statNums.forEach(function (el) {
+        var target = parseFloat(el.dataset.count || "0");
+        var decimals = parseInt(el.dataset.dec || "0", 10);
+        var prefix = el.dataset.prefix || "";
+        var suffix = el.dataset.suffix || "";
+        var render = function (value) {
+          return prefix + value.toFixed(decimals) + suffix;
+        };
+        if (reduced) {
+          el.textContent = render(target);
+          return;
+        }
+        var startedAt = 0;
+        var duration = 1500;
+        el.textContent = render(0);
+        var tick = function (time) {
+          if (!startedAt) startedAt = time;
+          var ratio = clamp((time - startedAt) / duration, 0, 1);
+          var eased = 1 - Math.pow(1 - ratio, 3);
+          el.textContent = render(target * eased);
+          if (ratio < 1) window.requestAnimationFrame(tick);
+        };
+        window.requestAnimationFrame(tick);
+      });
+    };
+    var statObserver = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          countUp();
+          statObserver.disconnect();
+        });
+      },
+      { threshold: 0.3 }
+    );
+    statObserver.observe(statGrid);
+  }
+
+  var faqItems = $$(".faq-item");
+  faqItems.forEach(function (item) {
+    var button = $(".faq-q", item);
+    if (!button) return;
+    button.addEventListener("click", function () {
+      var open = item.classList.toggle("open");
+      button.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  });
+
+  var copyButton = $("#copyInstall");
+  var installCommand = $("#installCmd");
+  if (copyButton && installCommand) {
+    copyButton.addEventListener("click", function () {
+      var text = installCommand.textContent.trim();
+      var label = copyButton.querySelector("span");
+      var finish = function (ok) {
+        if (!ok || !label) return;
+        copyButton.classList.add("done");
+        label.textContent = "已复制";
+        window.setTimeout(function () {
+          copyButton.classList.remove("done");
+          label.textContent = "复制";
+        }, 1800);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(
+          function () {
+            finish(true);
+          },
+          function () {
+            finish(false);
+          }
+        );
+        return;
+      }
+      var area = document.createElement("textarea");
+      area.value = text;
+      area.style.position = "fixed";
+      area.style.opacity = "0";
+      document.body.appendChild(area);
+      area.select();
+      var ok = false;
+      try {
+        ok = document.execCommand("copy");
+      } catch (error) {
+        ok = false;
+      }
+      area.remove();
+      finish(ok);
+    });
+  }
+
+  var getSection = $(".get-section");
+  if (getSection) {
+    if (reduced) {
+      getSection.classList.add("in");
+    } else {
+      new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) getSection.classList.add("in");
+          });
+        },
+        { threshold: 0.25 }
+      ).observe(getSection);
+    }
+  }
+
+  var MAP = "000000000000000000000000000100110011111111001111111111111111111100000000000001110000000000000000000000000000000011000000000000000000000000000000|000000000000000000000001001010011001000000001111111111111111111100000000000000000000000000000000111000000000000111111000000000000000000000000000|000000000000000000000011110000000011010000000000001111111111111100000000000000000000000000000110000000000111111111111000000000001000000000000000|100000000100000000000000011111000110111111100000000111111111111000000000000000000000000000000110000111011111111111111111111101111111100000000000|000001111111111111111111110101000011101100111000000111111111100000000000000000011111111000000101111010111111111111111111111111111111111111111111|111100111111111111111111111111111111110000111110000111111100000001000000000001111111110100111111111111111111111111111111111111111111111111111111|000000001111111111111111111111111111010100011100000111110000000010000000000011110111111111111111111111111111111111111111111111111111111111111110|000000111111111111111111111111111100000001100000000011100000000000000000001111100111111111111111111111111111111111111111111111111111111011111000|000000011110000001111111111111111110000001111110000000000000000000000000001111100111111111111111111111111111111111111111111111111000000010000000|000000001000000000011111111111111111100001111110000000000000000000000010000101001111111111111111111111111111111111111111111111100000001110000000|000000000000000000001111111111111111111011111111100000000000000000001101000111111111111111111111111111111111111111111111111111110000001100000000|000000000000000000000111111111111111111111111111110000000000000000000011111111111111111111111111111111111111111111111111111111110000000000000000|000000000000000000000011111111111111111111110100111000000000000000000011111111111111111111111111111111111111111111111111111111110000000000000000|000000000000000000000011111111111111111111111100000000000000000000000001111111111111010111110111111111111111111111111111111111100000000000000000|000000000000000000000011111111111111111111110000000000000000000000000001111010111110000011101111111111111111111111111111111111000100000000000000|000000000000000000000011111111111111111111100000000000000000000000001111100001101111011011110011111111111111111111111111111100001000000000000000|000000000000000000000001111111111111111111000000000000000000000000001111000000101001111111110011111111111111111111111110001000001000000000000000|000000000000000000000001111111111111111111000000000000000000000000000000111100000000011111111111111111111111111111111111000100110000000000000000|000000000000000000000000011111111111111110000000000000000000000000000111111100000000001111111111111111111111111111111111000001000000000000000000|000000000000000000000000010111111111111000000000000000000000000000001111111111101110101111111111111111111111111111111111100000000000000000000000|000000000000000000000000001111111100000100000000000000000000000000001111111111111111111111101111111111111111111111111111100000000000000000000000|000000000000000000000000000011111000000100000000000000000000000000111111111111111111110111110011111111111111111111111111000000000000000000000000|000000000000000000000000000001111000000000000000000000000000000000111111111111111111110111111110000111111111111111111110100000000000000000000000|000000000000000000000000000000111000100000000000000000000000000001111111111111111111111011111111000011111110011111100000000000000000000000000000|000000000000000000000000000000111101100000011000000000000000000000111111111111111111111011111110000001111100001111010000000000000000000000000000|000000000000000000000000000000000111100000000000000000000000000001111111111111111111111101111000000001111000000111100000100000000000000000000000|000000000000000000000000000000000000111000000000000000000000000001111111111111111111111111100000000000110000000111110000110000000000000000000000|000000000000000000000000000000000000000000101000000000000000000000111111111111111111111110010000000000110000000101100000000000000000000000000000|000000000000000000000000000000000000000101111111000000000000000000011111111111111111111111110000000000000000000100000000001000000000000000000000|000000000000000000000000000000000000000001111111100000000000000000001111101111111111111111110000000000001000000010000000000000000000000000000000|000000000000000000000000000000000000000001111111111100000000000000000000000011111111111111100000000000000000000110000110000000000000000000000000|000000000000000000000000000000000000000011111111111100000000000000000000000011111111111111000000000000000000000011001110000000000000000000000000|000000000000000000000000000000000000000011111111111111000000000000000000000011111111111110000000000000000000000011001110100011000000000000000000|000000000000000000000000000000000000000011111111111111111000000000000000000011111111111100000000000000000000000001000000100000111100000000000000|000000000000000000000000000000000000000011111111111111111100000000000000000001111111111100000000000000000000000000100000000000011110000000000000|000000000000000000000000000000000000000011111111111111111100000000000000000001111111111100000000000000000000000000000001101000001000000000000000|000000000000000000000000000000000000000001111111111111111000000000000000000001111111111100000000000000000000000000000000000000000000000000000000|000000000000000000000000000000000000000001111111111111110000000000000000000001111111111100010000000000000000000000000000000011000000000000000000|000000000000000000000000000000000000000000011111111111110000000000000000000001111111111100110000000000000000000000000000011111100100000000000000|000000000000000000000000000000000000000000001111111111110000000000000000000001111111110000110000000000000000000000000000011111111110000000000000|000000000000000000000000000000000000000000001111111111110000000000000000000001111111110001100000000000000000000000000011111111111111000000000000|000000000000000000000000000000000000000000001111111111000000000000000000000000111111110001100000000000000000000000000111111111111111000000000000|000000000000000000000000000000000000000000001111111110000000000000000000000000111111100000000000000000000000000000000111111111111111100000000000|000000000000000000000000000000000000000000011111111100000000000000000000000000011111100000000000000000000000000000000011111111111111100000000000|000000000000000000000000000000000000000000011111111100000000000000000000000000011111000000000000000000000000000000000011111111111111100000000000|000000000000000000000000000000000000000000011111111000000000000000000000000000011100000000000000000000000000000000000011110000111111100000000000|000000000000000000000000000000000000000000011111100000000000000000000000000000000000000000000000000000000000000000000000000000001111000000000000|000000000000000000000000000000000000000000011111000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000010|000000000000000000000000000000000000000000111100000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000100|000000000000000000000000000000000000000000011100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000|000000000000000000000000000000000000000000111000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000|000000000000000000000000000000000000000000111000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000|000000000000000000000000000000000000000000110000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000|000000000000000000000000000000000000000000011000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000|000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000|000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+
+  (function lightMap() {
+    var canvas = $("#map");
+    if (!canvas) return;
+    var ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    var rows = MAP.split("|");
+    var cols = rows[0].length;
+    var rowCount = rows.length;
+    var countEl = $("#cnt");
+    var randomBtn = $("#mapRandom");
+    var cells = [];
+    for (var r = 0; r < rowCount; r += 1) {
+      for (var c = 0; c < cols; c += 1) {
+        if (rows[r].charAt(c) === "1") cells.push({ c: c, r: r });
+      }
+    }
     var CITY = [
       [104.07, 30.67],
       [116.4, 39.9],
@@ -185,150 +668,211 @@ document.documentElement.classList.add("js");
       [77.6, 12.97],
       [-46.63, -23.55],
     ];
-    var lit = CITY.map(function (c, i) {
+    var lit = CITY.map(function (city, index) {
       return {
-        c: Math.floor((c[0] + 180) / 2.5),
-        r: Math.floor((80 - c[1]) / 2.5),
+        c: Math.floor((city[0] + 180) / 2.5),
+        r: Math.floor((80 - city[1]) / 2.5),
         t0: -9999,
-        ph: i * 0.37,
+        ph: index * 0.37,
       };
     });
-    function px(o) {
-      return [(o.c + 0.5) * cs, (o.r + 0.5) * cs];
-    }
-    function setup() {
-      dpr = Math.min(2, devicePixelRatio || 1);
-      W = cv.clientWidth;
-      H = (W * R) / C;
-      cv.width = W * dpr;
-      cv.height = H * dpr;
-      cv.style.height = H + "px";
-      cs = W / C;
+    var width = 0;
+    var height = 0;
+    var cell = 0;
+    var dpr = 1;
+    var base = null;
+    var baseCtx = null;
+    var visible = false;
+    var rafId = 0;
+    var lastPaint = 0;
+    var point = function (item) {
+      return [(item.c + 0.5) * cell, (item.r + 0.5) * cell];
+    };
+    var setup = function () {
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      width = canvas.clientWidth || 900;
+      cell = width / cols;
+      height = cell * rowCount;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      canvas.style.height = height + "px";
       base = document.createElement("canvas");
-      base.width = cv.width;
-      base.height = cv.height;
-      var b = base.getContext("2d");
-      b.scale(dpr, dpr);
-      b.fillStyle = "rgba(255,255,255,.17)";
-      for (var r = 0; r < R; r++)
-        for (var c = 0; c < C; c++)
-          if (MAP[r].charAt(c) === "1") {
-            b.beginPath();
-            b.arc((c + 0.5) * cs, (r + 0.5) * cs, cs * 0.3, 0, 7);
-            b.fill();
-          }
-    }
-    function draw(t) {
-      cx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      cx.clearRect(0, 0, W, H);
-      cx.drawImage(base, 0, 0, W, H);
-      var hub = px(lit[0]);
-      for (var i = 1; i < 14 && i < lit.length; i++) {
-        var p = px(lit[i]),
-          mx = (hub[0] + p[0]) / 2,
-          my =
-            (hub[1] + p[1]) / 2 -
-            Math.hypot(p[0] - hub[0], p[1] - hub[1]) * 0.28;
-        cx.strokeStyle = "rgba(139,123,255,.22)";
-        cx.lineWidth = 1;
-        cx.beginPath();
-        cx.moveTo(hub[0], hub[1]);
-        cx.quadraticCurveTo(mx, my, p[0], p[1]);
-        cx.stroke();
-        if (!reduce) {
-          var u = (t / 3200 + i * 0.17) % 1,
-            a = 1 - u,
-            x = a * a * hub[0] + 2 * a * u * mx + u * u * p[0],
-            y = a * a * hub[1] + 2 * a * u * my + u * u * p[1];
-          cx.fillStyle = "#fff";
-          cx.shadowColor = "#8b7bff";
-          cx.shadowBlur = 10;
-          cx.beginPath();
-          cx.arc(x, y, cs * 0.28, 0, 7);
-          cx.fill();
-          cx.shadowBlur = 0;
+      base.width = canvas.width;
+      base.height = canvas.height;
+      baseCtx = base.getContext("2d");
+      baseCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      baseCtx.clearRect(0, 0, width, height);
+      var gradient = baseCtx.createLinearGradient(0, 0, 0, height);
+      gradient.addColorStop(0, "rgba(175,185,210,.26)");
+      gradient.addColorStop(1, "rgba(140,150,180,.11)");
+      baseCtx.fillStyle = gradient;
+      for (var i = 0; i < cells.length; i += 1) {
+        var dot = cells[i];
+        baseCtx.beginPath();
+        baseCtx.arc(
+          (dot.c + 0.5) * cell,
+          (dot.r + 0.5) * cell,
+          Math.max(0.55, cell * 0.27),
+          0,
+          Math.PI * 2
+        );
+        baseCtx.fill();
+      }
+    };
+    var paint = function (time) {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, width, height);
+      if (base) ctx.drawImage(base, 0, 0, width, height);
+      if (!reduced) {
+        var hub = point(lit[0]);
+        for (var i = 1; i < lit.length; i += 1) {
+          var target = point(lit[i]);
+          var midX = (hub[0] + target[0]) / 2;
+          var midY =
+            (hub[1] + target[1]) / 2 -
+            Math.hypot(target[0] - hub[0], target[1] - hub[1]) * 0.24;
+          ctx.strokeStyle = "rgba(139,123,255,.16)";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(hub[0], hub[1]);
+          ctx.quadraticCurveTo(midX, midY, target[0], target[1]);
+          ctx.stroke();
+          var ratio = (time / 3600 + i * 0.13) % 1;
+          var inverse = 1 - ratio;
+          var x =
+            inverse * inverse * hub[0] +
+            2 * inverse * ratio * midX +
+            ratio * ratio * target[0];
+          var y =
+            inverse * inverse * hub[1] +
+            2 * inverse * ratio * midY +
+            ratio * ratio * target[1];
+          ctx.fillStyle = "rgba(235,238,255,.92)";
+          ctx.shadowColor = "rgba(139,123,255,.95)";
+          ctx.shadowBlur = 9;
+          ctx.beginPath();
+          ctx.arc(x, y, Math.max(0.8, cell * 0.26), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
         }
       }
-      lit.forEach(function (o, i) {
-        var q = px(o);
-        if (!reduce) {
-          var ph = (t / 1500 + o.ph) % 1;
-          cx.strokeStyle = "rgba(139,123,255," + 0.5 * (1 - ph) + ")";
-          cx.lineWidth = 1.2;
-          cx.beginPath();
-          cx.arc(q[0], q[1], cs * (0.6 + ph * 3.2), 0, 7);
-          cx.stroke();
-          var age = (t - o.t0) / 900;
+      for (var j = 0; j < lit.length; j += 1) {
+        var item = lit[j];
+        var spot = point(item);
+        if (!reduced) {
+          var phase = (time / 1800 + item.ph) % 1;
+          ctx.strokeStyle = "rgba(139,123,255," + (0.42 * (1 - phase)).toFixed(3) + ")";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.arc(spot[0], spot[1], cell * (0.7 + phase * 3.4), 0, Math.PI * 2);
+          ctx.stroke();
+          var age = (time - item.t0) / 900;
           if (age >= 0 && age < 1) {
-            cx.strokeStyle = "rgba(255,255,255," + (1 - age) + ")";
-            cx.beginPath();
-            cx.arc(q[0], q[1], cs * (1 + age * 7), 0, 7);
-            cx.stroke();
+            ctx.strokeStyle = "rgba(255,255,255," + (1 - age).toFixed(3) + ")";
+            ctx.beginPath();
+            ctx.arc(spot[0], spot[1], cell * (1 + age * 8), 0, Math.PI * 2);
+            ctx.stroke();
           }
         }
-        cx.fillStyle = "#b8adff";
-        cx.shadowColor = "#8b7bff";
-        cx.shadowBlur = 14;
-        cx.beginPath();
-        cx.arc(q[0], q[1], cs * 0.55, 0, 7);
-        cx.fill();
-        cx.shadowBlur = 0;
-      });
-      cnt.textContent = lit.length;
-    }
-    function loop(t) {
-      if (vis && !reduce) requestAnimationFrame(loop);
-      draw(t);
-    }
-    function pick(e) {
-      var r = cv.getBoundingClientRect(),
-        c = Math.floor((e.clientX - r.left) / cs),
-        rr = Math.floor((e.clientY - r.top) / cs),
-        best = null,
-        bd = 1e9;
-      for (var dr = -3; dr <= 3; dr++)
-        for (var dc = -3; dc <= 3; dc++) {
-          var R2 = rr + dr,
-            C2 = c + dc;
-          if (
-            R2 < 0 ||
-            R2 >= R ||
-            C2 < 0 ||
-            C2 >= C ||
-            MAP[R2].charAt(C2) !== "1"
-          )
-            continue;
-          var d = dr * dr + dc * dc;
-          if (d < bd) {
-            bd = d;
-            best = [C2, R2];
+        var preset = j < CITY.length;
+        ctx.fillStyle = preset ? "rgba(179,167,255,.95)" : "rgba(255,196,120,.95)";
+        ctx.shadowColor = preset ? "#8b7bff" : "#ffb45c";
+        ctx.shadowBlur = 12;
+        ctx.beginPath();
+        ctx.arc(spot[0], spot[1], cell * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+      if (countEl) countEl.textContent = String(lit.length);
+    };
+    var loop = function (time) {
+      if (!visible) return;
+      if (time - lastPaint > 34) {
+        lastPaint = time;
+        paint(time);
+      }
+      rafId = window.requestAnimationFrame(loop);
+    };
+    var start = function () {
+      if (reduced || rafId || !visible) return;
+      rafId = window.requestAnimationFrame(loop);
+    };
+    var stop = function () {
+      if (rafId) window.cancelAnimationFrame(rafId);
+      rafId = 0;
+    };
+    var nearest = function (clientX, clientY) {
+      var box = canvas.getBoundingClientRect();
+      var targetC = Math.floor((clientX - box.left) / cell);
+      var targetR = Math.floor((clientY - box.top) / cell);
+      var best = null;
+      var bestDistance = Infinity;
+      for (var dr = -3; dr <= 3; dr += 1) {
+        for (var dc = -3; dc <= 3; dc += 1) {
+          var rr = targetR + dr;
+          var cc = targetC + dc;
+          if (rr < 0 || rr >= rowCount || cc < 0 || cc >= cols) continue;
+          if (rows[rr].charAt(cc) !== "1") continue;
+          var distance = dr * dr + dc * dc;
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            best = { c: cc, r: rr };
           }
         }
-      if (!best) return;
-      if (
-        lit.some(function (o) {
-          return o.c === best[0] && o.r === best[1];
-        })
-      )
-        return;
-      lit.push({
-        c: best[0],
-        r: best[1],
-        t0: performance.now(),
-        ph: Math.random(),
+      }
+      return best;
+    };
+    var light = function (spot) {
+      if (!spot) return;
+      for (var i = 0; i < lit.length; i += 1) {
+        if (lit[i].c === spot.c && lit[i].r === spot.r) return;
+      }
+      lit.push({ c: spot.c, r: spot.r, t0: performance.now(), ph: Math.random() });
+      if (reduced) paint(performance.now());
+    };
+    canvas.addEventListener("click", function (event) {
+      light(nearest(event.clientX, event.clientY));
+    });
+    if (randomBtn) {
+      randomBtn.addEventListener("click", function () {
+        for (var tries = 0; tries < 60; tries += 1) {
+          var candidate = cells[Math.floor(Math.random() * cells.length)];
+          var used = lit.some(function (item) {
+            return item.c === candidate.c && item.r === candidate.r;
+          });
+          if (!used) {
+            light(candidate);
+            if (reduced) paint(performance.now());
+            return;
+          }
+        }
       });
-      if (reduce) draw(0);
     }
-    cv.addEventListener("click", pick);
-    setup();
-    draw(0);
+    if (!reduced) {
+      new IntersectionObserver(
+        function (entries) {
+          visible = entries[0].isIntersecting;
+          if (visible) start();
+          else stop();
+        },
+        { threshold: 0.15 }
+      ).observe(canvas);
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) stop();
+        else start();
+      });
+    }
     new ResizeObserver(function () {
       setup();
-      draw(performance.now());
-    }).observe(cv);
-    new IntersectionObserver(function (es) {
-      vis = es[0].isIntersecting;
-      if (vis) requestAnimationFrame(loop);
-    }).observe(cv);
-  }
+      paint(reduced ? 0 : performance.now());
+    }).observe(canvas);
+    setup();
+    paint(0);
+    if (reduced) visible = true;
+  })();
+
+  window.__codebayReady = true;
+  root.classList.add("ready");
+  root.classList.remove("js-fallback");
+  requestScroll();
 })();

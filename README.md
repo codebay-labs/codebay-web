@@ -1,12 +1,46 @@
 # CodeBay 官网
 
-CodeBay 的产品主页，纯静态站点（HTML + CSS + 原生 JS，无构建步骤）。
+CodeBay 的产品主页，纯静态站点（HTML + CSS + 原生 JS，无构建步骤、无第三方运行时、无外部 CDN）。
 
 - 入口：`index.html`
-- 样式：`style.css`（拉丁字体为自托管子集，位于 `assets/fonts/`）
+- 样式：`style.css`
 - 脚本：`main.js`
+- 字体：`assets/fonts/`（Manrope / Instrument Serif / JetBrains Mono，SIL OFL）
+- Agent 图标：`assets/agents/`
+- 界面截图：`assets/shots/hero.webp`（开发版浅色界面）
 - 未签名预览安装脚本：`install.sh`（下载、校验、ad-hoc 签名、安装）
-- 图片：`assets/shots/hero.webp` 与 `assets/logo.png`
+
+## 设计
+
+视觉方向是「深空控制室 + 纸面验收记录」：暗色海面负责氛围，纸面段只放可复查的数字，琥珀只表示「有 Agent 在等你」。
+颜色语义：紫罗兰 = 品牌与背景光，薄荷 = 运行中，琥珀 = 等待/被看见；除此以外不装饰性用色。
+
+组件参照 [Aceternity UI](https://ui.aceternity.com/components) 的公开示例，全部用原生 HTML/CSS/JS 重写，没有引入 React、Tailwind 或任何 npm 依赖：
+
+- [Spotlight](https://ui.aceternity.com/components/spotlight)
+- [Aurora Background](https://ui.aceternity.com/components/aurora-background)
+- [Background Beams](https://ui.aceternity.com/components/background-beams)
+- [Grid and Dot Backgrounds](https://ui.aceternity.com/components/grid-and-dot-backgrounds)
+- [Sparkles](https://ui.aceternity.com/components/sparkles)
+- [Meteors](https://ui.aceternity.com/components/meteors)
+- [Text Generate Effect](https://ui.aceternity.com/components/text-generate-effect)
+- [Flip Words](https://ui.aceternity.com/components/flip-words)
+- [Moving Border](https://ui.aceternity.com/components/moving-border)
+- [Infinite Moving Cards](https://ui.aceternity.com/components/infinite-moving-cards)
+- [Container Scroll Animation](https://ui.aceternity.com/components/container-scroll-animation)
+- [Bento Grid](https://ui.aceternity.com/components/bento-grid)
+- [Card Spotlight](https://ui.aceternity.com/components/card-spotlight)
+- [Keyboard](https://ui.aceternity.com/components/keyboard)
+- [Animated Tooltip](https://ui.aceternity.com/components/animated-tooltip)
+- [World Map](https://ui.aceternity.com/components/world-map)
+- [Lamp Effect](https://ui.aceternity.com/components/lamp-effect)
+
+约束与回退：
+
+- 所有动画只动 `transform` / `opacity`；滚动由一个 passive 监听 + 一个 rAF 调度，Canvas 30fps 上限且离屏/后台暂停。
+- `prefers-reduced-motion: reduce` 下停用持续动画与 Canvas 循环，内容直接显示终态。
+- 无 JS 时隐藏初态全部失效，FAQ、下载、截图区仍可读；地图给出 noscript 说明。
+- 字体、图标、截图全部自托管；页面不加载任何外部 CDN、字体或统计脚本。
 
 ## 本地预览
 
@@ -34,5 +68,5 @@ Scripts/deploy-web.sh
 ## 发布流程
 
 `.github/workflows/release.yml` 从私有源码仓库 `go-kenka/CodeBay` 构建 App，
-并把 DMG 发到本仓库的 GitHub Release（资产名固定为 `CodeBay.dmg`）。
+并把 DMG 发到本仓库的 GitHub Release（资产名为 `CodeBay-<arch>.dmg`，如 `CodeBay-arm64.dmg`）。
 详见主仓库的 `docs/release.md`。
