@@ -2,7 +2,7 @@
 #
 # install.sh — install the unsigned CodeBay preview on macOS.
 #
-#   curl -fsSL https://go-kenka.github.io/codebay-site/install.sh | bash -s -- --allow-unsigned
+#   curl -fsSL https://codebay-labs.github.io/codebay-web/install.sh | bash -s -- --allow-unsigned
 #
 # What it does:
 #   1. downloads CodeBay-<arch>.dmg from the latest preview release
@@ -18,7 +18,7 @@
 set -eo pipefail
 
 REPO="$CODEBAY_REPO"
-if [ -z "$REPO" ]; then REPO="go-kenka/codebay-site"; fi
+if [ -z "$REPO" ]; then REPO="codebay-labs/codebay-web"; fi
 TAG="$CODEBAY_RELEASE_TAG"
 if [ -z "$TAG" ]; then
   API="https://api.github.com/repos/$REPO/releases"
