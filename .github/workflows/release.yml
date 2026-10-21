@@ -28,7 +28,7 @@ jobs:
       - name: Check out CodeBay source
         uses: actions/checkout@v4
         with:
-          repository: go-kenka/CodeBay
+          repository: codebay-labs/codebay
           ref: main
           ssh-key: ${{ secrets.APP_DEPLOY_KEY }}
           persist-credentials: false
